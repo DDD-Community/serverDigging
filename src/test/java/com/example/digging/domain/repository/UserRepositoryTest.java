@@ -14,18 +14,25 @@ public class UserRepositoryTest {
 
     @Test
     public void create(){
+
         User user = new User();
-        user.setId(1);
-        user.setCreatedAt(LocalDateTime.now());
-        user.setEmail("digging@gmail.com");
-        user.setPassword("password");
-        user.setUsername("testuser1");
+
+        user.setEmail("gmail");
+        user.setPassword("pass");
+        user.setUsername("test");
         user.setProvider("admin");
         user.setRole("admin");
-        user.setInterest("develop");
-        user.setUpdatedAt(LocalDateTime.now());
+        user.setInterest("dev");
+        user.setCreatedAt(LocalDateTime.now());
+        System.out.println(user);
 
         User newUser = userRepository.save(user);
 
     }
+
+//    public void read(){
+//        Optional<User> user = userRepository.findAll();
+//
+//        user.ifPresent(user ->)
+//    }
 }
