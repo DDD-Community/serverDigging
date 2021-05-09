@@ -30,9 +30,9 @@ public class UserRepositoryTest {
 
     }
 
-//    public void read(){
-//        Optional<User> user = userRepository.findAll();
-//
-//        user.ifPresent(user ->)
-//    }
+    public void read(){
+        Optional<User> user = userRepository.findAll();
+
+        user.ifPresent(user ->)
+    }
 }
