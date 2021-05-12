@@ -5,6 +5,7 @@ import com.example.digging.domain.entity.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -52,7 +53,10 @@ public class UserRepositoryTest extends DiggingApplicationTests {
         });
     }
 
+
+    // Transactional : mysql DB는 변동 안 됨
     @Test
+    @Transactional
     public void delete() {
         Optional<User> user = userRepository.findById(4);
 
