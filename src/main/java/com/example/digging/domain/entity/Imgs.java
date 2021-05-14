@@ -16,8 +16,8 @@ public class Imgs {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int postId;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int imgId;
 
     @Id
