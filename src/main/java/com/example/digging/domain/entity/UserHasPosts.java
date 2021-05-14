@@ -21,6 +21,6 @@ public class UserHasPosts {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int postsPostId;
 
-    @ManyToOne
-    private User user;
+//    @ManyToOne
+//    private User user;
 }
