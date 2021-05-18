@@ -3,22 +3,25 @@ package com.example.digging.domain.entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@ToString(exclude = {"posts", "tags"})
 public class PostTag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int postId;
+    private int Id;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int tagId;
+    @ManyToOne
+    @JoinColumn(name = "post_id")
+    private Posts posts;
+
+    @ManyToOne
+    @JoinColumn(name = "tag_id")
+    private Tags tags;
 }

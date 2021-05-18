@@ -30,7 +30,7 @@ public class User {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-//    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
-//    private List<UserHasPosts> userHasPostsList;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
+    private List<UserHasPosts> userHasPostsList;
 
 }

@@ -11,16 +11,19 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@ToString(exclude = {"user"})
+@ToString(exclude = {"user", "posts"})
 public class UserHasPosts {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int userId;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int postsPostId;
+    private int id;
 
-//    @ManyToOne
-//    private User user;
+    @ManyToOne
+    @JoinColumn(name="posts_post_id", referencedColumnName="post_id")
+    private Posts posts;
+
+    @ManyToOne
+    @JoinColumn(name="user_id", referencedColumnName="id")
+    private User user;
+
 }
