@@ -51,14 +51,15 @@ public class UserApiLogicService implements CrudInterface<UserApiRequest, UserAp
     }
 
     @Override
-    public Header<UserApiResponse> update(Header<UserApiRequest> request) {
+    public Header<UserApiResponse> update(Integer id, Header<UserApiRequest> request) {
         UserApiRequest userApiRequest = request.getData();
-
-        Optional<User> optional = userRepository.findById(userApiRequest.getId());
+        Optional<User> optional = userRepository.findById(id);
+        System.out.println(userApiRequest);
+        System.out.println(optional);
 
         return optional
                 .map(user -> {
-                    user.setRole(user.getRole())
+                    user.setRole(userApiRequest.getRole())
                             .setUpdatedAt(LocalDateTime.now())
                             ;
                     return user;
