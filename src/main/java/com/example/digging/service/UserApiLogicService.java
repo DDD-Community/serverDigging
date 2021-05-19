@@ -8,8 +8,10 @@ import com.example.digging.domain.repository.UserRepository;
 import com.example.digging.ifs.CrudInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 public class UserApiLogicService implements CrudInterface<UserApiRequest, UserApiResponse> {
@@ -38,8 +40,14 @@ public class UserApiLogicService implements CrudInterface<UserApiRequest, UserAp
     }
 
     @Override
-    public Header<UserApiResponse> read(int id) {
-        return null;
+    public Header<UserApiResponse> read(Integer id) {
+        System.out.println(id);
+        Optional<User> optional = userRepository.findById(id);
+        return optional
+                .map(user -> response(user))
+                .orElseGet(
+                        ()->Header.ERROR("데이터 없음")
+                );
     }
 
     @Override
@@ -48,7 +56,7 @@ public class UserApiLogicService implements CrudInterface<UserApiRequest, UserAp
     }
 
     @Override
-    public Header delete(int id) {
+    public Header delete(Integer id) {
         return null;
     }
 
