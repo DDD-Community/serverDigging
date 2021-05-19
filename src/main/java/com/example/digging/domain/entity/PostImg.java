@@ -19,7 +19,7 @@ public class PostImg {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int imgId;
+    private Integer imgId;
 
     private String title;
     private LocalDateTime createdAt;

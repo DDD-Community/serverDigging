@@ -17,7 +17,7 @@ import java.util.List;
 public class Posts {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int postId;
+    private Integer postId;
 
     private Boolean isText;
     private Boolean isImg;

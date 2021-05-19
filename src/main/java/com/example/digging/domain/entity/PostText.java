@@ -17,7 +17,7 @@ public class PostText {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int textId;
+    private Integer textId;
 
     private String title;
     private String content;

@@ -16,7 +16,7 @@ public class UserHasPosts {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
     @ManyToOne
 //    @JoinColumn(name="posts_post_id", referencedColumnName="post_id")

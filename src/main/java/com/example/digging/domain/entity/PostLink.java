@@ -17,7 +17,7 @@ public class PostLink {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int linkId;
+    private Integer linkId;
 
     private String title;
     private String url;

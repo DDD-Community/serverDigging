@@ -16,7 +16,7 @@ import java.util.List;
 public class Tags {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int tagId;
+    private Integer tagId;
 
     private String tags;
 

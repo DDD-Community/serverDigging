@@ -15,7 +15,7 @@ import javax.persistence.*;
 public class PostTag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int Id;
+    private Integer Id;
 
     @ManyToOne
 //    @JoinColumn(name = "post_id")
