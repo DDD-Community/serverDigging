@@ -1,9 +1,7 @@
 package com.example.digging.domain.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
+import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -12,6 +10,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Builder
+@Accessors(chain = true)
 @ToString(exclude = {"posts"})
 public class PostText {
 
@@ -27,6 +27,6 @@ public class PostText {
     private String updatedBy;
 
     @ManyToOne
-    @JoinColumn(name = "post_id")
+//    @JoinColumn(name = "post_id")
     private Posts posts;
 }

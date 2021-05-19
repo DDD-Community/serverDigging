@@ -1,8 +1,7 @@
 package com.example.digging.domain.entity;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.*;
+import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 
@@ -11,6 +10,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Entity
 @Builder
+@Accessors(chain = true)
 @ToString(exclude = {"postImg"})
 public class Imgs {
 
@@ -22,9 +22,9 @@ public class Imgs {
     private String imgUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumns({
-            @JoinColumn(name="post_id", referencedColumnName="post_id"),
-            @JoinColumn(name="img_id", referencedColumnName="img_id")
-    })
+//    @JoinColumns({
+//            @JoinColumn(name="post_id", referencedColumnName="post_id"),
+//            @JoinColumn(name="img_id", referencedColumnName="img_id")
+//    })
     private PostImg postImg;
 }

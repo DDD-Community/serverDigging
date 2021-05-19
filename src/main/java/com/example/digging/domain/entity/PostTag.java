@@ -1,9 +1,7 @@
 package com.example.digging.domain.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
+import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 
@@ -11,6 +9,8 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Builder
+@Accessors(chain = true)
 @ToString(exclude = {"posts", "tags"})
 public class PostTag {
     @Id
@@ -18,10 +18,10 @@ public class PostTag {
     private int Id;
 
     @ManyToOne
-    @JoinColumn(name = "post_id")
+//    @JoinColumn(name = "post_id")
     private Posts posts;
 
     @ManyToOne
-    @JoinColumn(name = "tag_id")
+//    @JoinColumn(name = "tag_id")
     private Tags tags;
 }

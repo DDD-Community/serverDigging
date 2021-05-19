@@ -12,7 +12,7 @@ public class DiggingController {
 
     @RequestMapping(method = RequestMethod.GET, path = "getMethod")
     public String getRequest() {
-        return "Get Method Test";
+        return "Get Method Test2";
     }
 
     @GetMapping("/header")
