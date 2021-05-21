@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class PostLinkApiRequest {
     private String userName;
+    private Integer userId;
     private String title;
     private String url;
 }

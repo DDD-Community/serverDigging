@@ -1,25 +1,29 @@
 package com.example.digging.service;
 
+import com.example.digging.domain.entity.User;
 import com.example.digging.domain.network.Header;
 import com.example.digging.domain.network.request.PostsApiRequest;
 import com.example.digging.domain.network.response.PostsApiResponse;
-import com.example.digging.ifs.CrudInterface;
+import com.example.digging.ifs.PostsCrudInterface;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
-public class PostsApiLogicService implements CrudInterface<PostsApiRequest, PostsApiResponse> {
+public class PostsApiLogicService implements PostsCrudInterface<PostsApiRequest, PostsApiResponse> {
+
     @Override
-    public Header<PostsApiResponse> create(Header<PostsApiRequest> request) {
+    public Header<PostsApiRequest> create(Integer userId, String type) {
         return null;
     }
 
     @Override
-    public Header<PostsApiResponse> read(Integer id) {
+    public Header<PostsApiRequest> read(Integer id) {
         return null;
     }
 
     @Override
-    public Header<PostsApiResponse> update(Integer id, Header<PostsApiRequest> request) {
+    public Header<PostsApiRequest> update(Integer id) {
         return null;
     }
 

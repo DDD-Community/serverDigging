@@ -27,6 +27,5 @@ public class PostLink {
     private String updatedBy;
 
     @ManyToOne
-//    @JoinColumn(name = "post_id")
     private Posts posts;
 }

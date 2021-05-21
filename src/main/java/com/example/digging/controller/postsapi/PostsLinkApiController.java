@@ -2,9 +2,16 @@ package com.example.digging.controller.postsapi;
 
 import com.example.digging.domain.network.Header;
 import com.example.digging.domain.network.request.PostLinkApiRequest;
+import com.example.digging.domain.network.request.UserApiRequest;
 import com.example.digging.domain.network.response.PostLinkApiResponse;
+import com.example.digging.domain.network.response.UserApiResponse;
 import com.example.digging.ifs.CrudInterface;
+import com.example.digging.service.PostLinkApiLogicService;
+import com.example.digging.service.UserApiLogicService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -12,9 +19,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/postlink")
 public class PostsLinkApiController implements CrudInterface<PostLinkApiRequest, PostLinkApiResponse> {
+    @Autowired
+    private PostLinkApiLogicService postLinkApiLogicService;
+
     @Override
-    public Header<PostLinkApiResponse> create(Header<PostLinkApiRequest> request) {
-        return null;
+    @PostMapping("")
+    public Header<PostLinkApiResponse> create(@RequestBody Header<PostLinkApiRequest> request) {
+        log.info("{}", request);
+        return postLinkApiLogicService.create(request);
     }
 
     @Override
