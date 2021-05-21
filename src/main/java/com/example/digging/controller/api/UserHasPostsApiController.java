@@ -27,7 +27,7 @@ public class UserHasPostsApiController implements CrudInterface<UserHasPostsApiR
     @Override
     @GetMapping("/{id}")
     public Header<UserHasPostsApiResponse> read(@PathVariable Integer id) {
-        return null;
+        return userHasPostsApiLogicService.read(id);
     }
 
     @Override

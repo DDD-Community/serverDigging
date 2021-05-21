@@ -13,6 +13,8 @@ public class UserHasPostsApiResponse {
 
     private Integer id;
     private Integer userId;
+    private String userName;
     private Integer postsPostId;
+    private String postsType;
 
 }

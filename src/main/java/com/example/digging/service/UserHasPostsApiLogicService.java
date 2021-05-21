@@ -1,5 +1,6 @@
 package com.example.digging.service;
 
+import com.example.digging.domain.entity.User;
 import com.example.digging.domain.entity.UserHasPosts;
 import com.example.digging.domain.network.Header;
 import com.example.digging.domain.network.request.UserHasPostsApiRequest;
@@ -10,6 +11,8 @@ import com.example.digging.domain.repository.UserRepository;
 import com.example.digging.ifs.CrudInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class UserHasPostsApiLogicService implements CrudInterface<UserHasPostsApiRequest, UserHasPostsApiResponse> {
@@ -36,7 +39,12 @@ public class UserHasPostsApiLogicService implements CrudInterface<UserHasPostsAp
 
     @Override
     public Header<UserHasPostsApiResponse> read(Integer id) {
-        return null;
+        Optional<UserHasPosts> optional = userHasPostsRepository.findById(id);
+        return optional
+                .map(userHasPosts -> response(userHasPosts))
+                .orElseGet(
+                        ()->Header.ERROR("데이터 없음")
+                );
     }
 
     @Override
@@ -50,10 +58,23 @@ public class UserHasPostsApiLogicService implements CrudInterface<UserHasPostsAp
     }
 
     private Header<UserHasPostsApiResponse> response(UserHasPosts userHasPosts){
+        String typeCheck = "";
+        if (userHasPosts.getPosts().getIsImg() == Boolean.TRUE) {
+            typeCheck = "Img";
+        }else {
+            if(userHasPosts.getPosts().getIsText() == Boolean.TRUE) {
+                typeCheck = "Text";
+            } else {
+                typeCheck = "Link";
+            }
+        }
+
         UserHasPostsApiResponse body = UserHasPostsApiResponse.builder()
                 .id(userHasPosts.getId())
                 .userId(userHasPosts.getUser().getId())
+                .userName(userHasPosts.getUser().getUsername())
                 .postsPostId(userHasPosts.getPosts().getPostId())
+                .postsType(typeCheck)
                 .build();
         return Header.OK(body);
     }
