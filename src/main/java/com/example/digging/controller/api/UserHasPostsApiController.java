@@ -39,6 +39,7 @@ public class UserHasPostsApiController implements CrudInterface<UserHasPostsApiR
     @Override
     @DeleteMapping("/{id}")
     public Header delete(@PathVariable Integer id) {
-        return null;
+
+        return userHasPostsApiLogicService.delete(id);
     }
 }

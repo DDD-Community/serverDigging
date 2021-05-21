@@ -54,7 +54,15 @@ public class UserHasPostsApiLogicService implements CrudInterface<UserHasPostsAp
 
     @Override
     public Header delete(Integer id) {
-        return null;
+        Optional<UserHasPosts> optional = userHasPostsRepository.findById(id);
+        return optional
+                .map(userHasPosts -> {
+                    userHasPostsRepository.delete(userHasPosts);
+                    return Header.OK();
+                })
+                .orElseGet(
+                        ()->Header.ERROR("데이터 없음")
+                );
     }
 
     private Header<UserHasPostsApiResponse> response(UserHasPosts userHasPosts){
