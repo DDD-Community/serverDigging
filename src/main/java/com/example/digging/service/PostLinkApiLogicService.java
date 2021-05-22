@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -49,7 +50,7 @@ public class PostLinkApiLogicService implements CrudInterface<PostLinkApiRequest
         String linkStirng = body.getUrl();
 
         String[] tags = body.getTagsArr();
-
+        ArrayList<String> newTagList = new ArrayList<String>();
         Boolean urlCheck = urlTypeValidation.valid(linkStirng);
 
         if(urlCheck == Boolean.TRUE){
@@ -68,24 +69,20 @@ public class PostLinkApiLogicService implements CrudInterface<PostLinkApiRequest
 
             for (int i=0; i<tags.length; i++) {
                 String checkTag = tags[i];
-                System.out.println(checkTag);
                 Tags existTag = tagsRepository.findByTags(checkTag);
-                System.out.println(existTag);
                 if (existTag != null){
-
                     PostTag postTag = PostTag.builder()
                             .posts(newPosts)
                             .tags(existTag)
                             .build();
                     postTagRepository.save(postTag);
-
                 } else {
 
                     Tags newTags = Tags.builder()
                             .tags(tags[i])
                             .build();
                     Tags newTag = tagsRepository.save(newTags);
-
+                    newTagList.add(tags[i]);
                     PostTag postTag = PostTag.builder()
                             .posts(newPosts)
                             .tags(newTag)
@@ -112,7 +109,7 @@ public class PostLinkApiLogicService implements CrudInterface<PostLinkApiRequest
                     .build();
             PostLink newPostLink = postLinkRepository.save(postLink);
 
-            return response(newPostLink, "Valid Url");
+            return response(newPostLink, "Valid Url", newTagList);
 
 
         }else{
@@ -135,7 +132,7 @@ public class PostLinkApiLogicService implements CrudInterface<PostLinkApiRequest
         return null;
     }
 
-    private Header<PostLinkApiResponse> response(PostLink postLink, String valid){
+    private Header<PostLinkApiResponse> response(PostLink postLink, String valid, ArrayList<String> tags){
 
         PostLinkApiResponse postLinkApiResponse = PostLinkApiResponse.builder()
                 .userName(postLink.getCreatedBy())
@@ -143,6 +140,7 @@ public class PostLinkApiLogicService implements CrudInterface<PostLinkApiRequest
                 .linkId(postLink.getLinkId())
                 .title(postLink.getTitle())
                 .urlCheck(valid)
+                .newTags(tags)
                 .build();
 
         return Header.OK(postLinkApiResponse);
