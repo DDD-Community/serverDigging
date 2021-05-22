@@ -69,7 +69,7 @@ public class PostLinkApiLogicService implements CrudInterface<PostLinkApiRequest
 
             for (int i=0; i<tags.length; i++) {
                 String checkTag = tags[i];
-                Tags existTag = tagsRepository.findByTags(checkTag);
+                Tags existTag = tagsRepository.findByTagsAndUserId(checkTag, body.getUserId());
                 if (existTag != null){
                     PostTag postTag = PostTag.builder()
                             .posts(newPosts)
@@ -80,6 +80,7 @@ public class PostLinkApiLogicService implements CrudInterface<PostLinkApiRequest
 
                     Tags newTags = Tags.builder()
                             .tags(tags[i])
+                            .user(userRepository.getOne(body.getUserId()))
                             .build();
                     Tags newTag = tagsRepository.save(newTags);
                     newTagList.add(tags[i]);

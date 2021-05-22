@@ -1,14 +1,17 @@
 package com.example.digging.service;
 
+import com.example.digging.domain.entity.Tags;
 import com.example.digging.domain.entity.User;
 import com.example.digging.domain.network.Header;
+import com.example.digging.domain.network.request.CheckUserRequest;
 import com.example.digging.domain.network.request.UserApiRequest;
+import com.example.digging.domain.network.response.TotalTagResponse;
 import com.example.digging.domain.network.response.UserApiResponse;
+import com.example.digging.domain.repository.TagsRepository;
 import com.example.digging.domain.repository.UserRepository;
 import com.example.digging.ifs.CrudInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -18,6 +21,9 @@ public class UserApiLogicService implements CrudInterface<UserApiRequest, UserAp
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private TagsRepository tagsRepository;
 
     @Override
     public Header<UserApiResponse> create(Header<UserApiRequest> request) {
@@ -88,6 +94,21 @@ public class UserApiLogicService implements CrudInterface<UserApiRequest, UserAp
 
     }
 
+    public Header<TotalTagResponse> getUserTotalTags(Header<CheckUserRequest> request) {
+        Optional<Tags> optional = tagsRepository.findAllByUserId(request.getData().getId());
+        return optional
+                .map( tag -> {
+                    TotalTagResponse totalTagResponse = TotalTagResponse.builder()
+                            .totalTags(optional)
+                            .build();
+                    return Header.OK(totalTagResponse);
+                })
+                .orElseGet(
+                        () -> Header.ERROR("태그 없음")
+                );
+
+    }
+
     private Header<UserApiResponse> response(User user){
         UserApiResponse userApiResponse = UserApiResponse.builder()
                 .id(user.getId())
@@ -104,4 +125,5 @@ public class UserApiLogicService implements CrudInterface<UserApiRequest, UserAp
         return Header.OK(userApiResponse);
 
     }
+
 }

@@ -22,4 +22,7 @@ public class Tags {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "tags", cascade = CascadeType.ALL)
     private List<PostTag> postTagList;
+
+    @ManyToOne
+    private User user;
 }
