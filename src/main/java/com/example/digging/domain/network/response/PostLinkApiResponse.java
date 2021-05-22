@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -15,5 +17,5 @@ public class PostLinkApiResponse {
     private Integer linkId;
     private String title;
     private String urlCheck; //유효한 주소인 지 여부
-
+    private String[] tags;
 }

@@ -1,22 +1,19 @@
 package com.example.digging.service;
 
-import com.example.digging.domain.entity.PostLink;
-import com.example.digging.domain.entity.Posts;
-import com.example.digging.domain.entity.UserHasPosts;
+import com.example.digging.domain.entity.*;
 import com.example.digging.domain.network.Header;
 import com.example.digging.domain.network.request.PostLinkApiRequest;
 import com.example.digging.domain.network.response.PostLinkApiResponse;
-import com.example.digging.domain.repository.PostLinkRepository;
-import com.example.digging.domain.repository.PostsRepository;
-import com.example.digging.domain.repository.UserHasPostsRepository;
-import com.example.digging.domain.repository.UserRepository;
+import com.example.digging.domain.repository.*;
 import com.example.digging.ifs.CrudInterface;
 import com.example.digging.util.UrlTypeValidation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.support.NullValue;
 import org.springframework.stereotype.Service;
 
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class PostLinkApiLogicService implements CrudInterface<PostLinkApiRequest, PostLinkApiResponse> {
@@ -36,13 +33,27 @@ public class PostLinkApiLogicService implements CrudInterface<PostLinkApiRequest
     @Autowired
     private UrlTypeValidation urlTypeValidation;
 
+    @Autowired
+    private TagsRepository tagsRepository;
+
+    @Autowired
+    private PostTagRepository postTagRepository;
+
+//    for (int i=0; i<weeks.length; i++) {
+//        System.out.println(weeks[i]);
+//    }
+
     @Override
     public Header<PostLinkApiResponse> create(Header<PostLinkApiRequest> request) {
         PostLinkApiRequest body = request.getData();
         String linkStirng = body.getUrl();
+
+        String[] tags = body.getTagsArr();
+
         Boolean urlCheck = urlTypeValidation.valid(linkStirng);
 
         if(urlCheck == Boolean.TRUE){
+
             Posts posts = Posts.builder()
                     .isText(Boolean.FALSE)
                     .isImg(Boolean.FALSE)
@@ -55,14 +66,43 @@ public class PostLinkApiLogicService implements CrudInterface<PostLinkApiRequest
                     .build();
             Posts newPosts = postsRepository.save(posts);
 
+            for (int i=0; i<tags.length; i++) {
+                String checkTag = tags[i];
+                System.out.println(checkTag);
+                Tags existTag = tagsRepository.findByTags(checkTag);
+                System.out.println(existTag);
+                if (existTag != null){
+
+                    PostTag postTag = PostTag.builder()
+                            .posts(newPosts)
+                            .tags(existTag)
+                            .build();
+                    postTagRepository.save(postTag);
+
+                } else {
+
+                    Tags newTags = Tags.builder()
+                            .tags(tags[i])
+                            .build();
+                    Tags newTag = tagsRepository.save(newTags);
+
+                    PostTag postTag = PostTag.builder()
+                            .posts(newPosts)
+                            .tags(newTag)
+                            .build();
+
+                    postTagRepository.save(postTag);
+                }
+            }
+
             UserHasPosts userHasPosts = UserHasPosts.builder()
                     .user(userRepository.getOne(body.getUserId()))
-                    .posts(postsRepository.getOne(posts.getPostId()))
+                    .posts(newPosts)
                     .build();
-            UserHasPosts newUserHasPosts = userHasPostsRepository.save(userHasPosts);
+            userHasPostsRepository.save(userHasPosts);
 
             PostLink postLink = PostLink.builder()
-                    .posts(postsRepository.getOne(posts.getPostId()))
+                    .posts(newPosts)
                     .title(body.getTitle())
                     .url(body.getUrl())
                     .createdAt(LocalDateTime.now())
