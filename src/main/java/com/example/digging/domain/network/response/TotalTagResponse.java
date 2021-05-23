@@ -6,12 +6,16 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class TotalTagResponse {
-    private Optional<Tags> totalTags;
+    private int totalNum;
+    private ArrayList<String> totalTags;
 }

@@ -13,7 +13,11 @@ import com.example.digging.ifs.CrudInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import java.lang.reflect.Array;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -95,17 +99,25 @@ public class UserApiLogicService implements CrudInterface<UserApiRequest, UserAp
     }
 
     public Header<TotalTagResponse> getUserTotalTags(Header<CheckUserRequest> request) {
-        Optional<Tags> optional = tagsRepository.findAllByUserId(request.getData().getId());
-        return optional
-                .map( tag -> {
-                    TotalTagResponse totalTagResponse = TotalTagResponse.builder()
-                            .totalTags(optional)
-                            .build();
-                    return Header.OK(totalTagResponse);
-                })
-                .orElseGet(
-                        () -> Header.ERROR("태그 없음")
-                );
+
+        List<Tags> userTagList = tagsRepository.findAllByUserId(request.getData().getId());
+        int userTagNum = userTagList.size();
+        ArrayList<String> tagStr = new ArrayList<String>();
+
+        for (int i =0;i<userTagNum;i++) {
+            tagStr.add(userTagList.get(i).getTags());
+        }
+
+        if (userTagNum>0){
+            TotalTagResponse totalTagResponse = TotalTagResponse.builder()
+                    .totalNum(userTagNum)
+                    .totalTags(tagStr)
+                    .build();
+            return Header.OK(totalTagResponse);
+        }else{
+            return Header.ERROR("태그 없음");
+        }
+
 
     }
 
