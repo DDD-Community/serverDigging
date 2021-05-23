@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequestMapping("/postlink")
-public class PostsLinkApiController implements CrudInterface<PostLinkApiRequest, PostLinkApiResponse> {
+public class PostLinkApiController implements CrudInterface<PostLinkApiRequest, PostLinkApiResponse> {
     @Autowired
     private PostLinkApiLogicService postLinkApiLogicService;
 

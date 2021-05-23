@@ -5,6 +5,7 @@ import com.example.digging.domain.entity.User;
 import com.example.digging.domain.network.Header;
 import com.example.digging.domain.network.request.CheckUserRequest;
 import com.example.digging.domain.network.request.UserApiRequest;
+import com.example.digging.domain.network.response.RecentDiggingResponse;
 import com.example.digging.domain.network.response.TotalTagResponse;
 import com.example.digging.domain.network.response.UserApiResponse;
 import com.example.digging.domain.repository.TagsRepository;
@@ -13,8 +14,7 @@ import com.example.digging.ifs.CrudInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import java.lang.reflect.Array;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -119,6 +119,10 @@ public class UserApiLogicService implements CrudInterface<UserApiRequest, UserAp
         }
 
 
+    }
+
+    public Header<RecentDiggingResponse> getUserRecentDigging(Header<CheckUserRequest> request) {
+        return null;
     }
 
     private Header<UserApiResponse> response(User user){

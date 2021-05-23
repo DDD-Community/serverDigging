@@ -40,9 +40,6 @@ public class PostLinkApiLogicService implements CrudInterface<PostLinkApiRequest
     @Autowired
     private PostTagRepository postTagRepository;
 
-//    for (int i=0; i<weeks.length; i++) {
-//        System.out.println(weeks[i]);
-//    }
 
     @Override
     public Header<PostLinkApiResponse> create(Header<PostLinkApiRequest> request) {
