@@ -12,7 +12,7 @@ import java.util.List;
 @Entity
 @Builder
 @Accessors(chain = true)
-@ToString(exclude = {"postTagList"})
+@ToString(exclude = {"postTagList", "user"})
 public class Tags {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

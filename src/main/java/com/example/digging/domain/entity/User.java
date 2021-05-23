@@ -14,7 +14,8 @@ import java.util.List;
 @Entity
 @Builder
 @Accessors(chain = true)
-@ToString(exclude = {"userHasPosts"})
+// 익스클루드 고치기
+@ToString(exclude = {"userHasPostsList", "tagsList"})
 public class User {
 
     @Id

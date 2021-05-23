@@ -17,8 +17,5 @@ public class PostImgRepositoryTest extends DiggingApplicationTests {
     @Test
     public void create(){
 
-        PostImg postImg = new PostImg();
-        postImg.set
-        System.out.println(newUser);
     }
 }

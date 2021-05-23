@@ -16,9 +16,6 @@ public class ImgsRepositoryTest extends DiggingApplicationTests {
     @Test
     public void create(){
 
-        Imgs imgs = new Imgs();
-
-        imgs.set
 
     }
 }
