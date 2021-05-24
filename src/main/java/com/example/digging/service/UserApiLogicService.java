@@ -1,14 +1,20 @@
 package com.example.digging.service;
 
+import com.example.digging.domain.entity.Posts;
 import com.example.digging.domain.entity.Tags;
 import com.example.digging.domain.entity.User;
+import com.example.digging.domain.entity.UserHasPosts;
 import com.example.digging.domain.network.Header;
 import com.example.digging.domain.network.request.CheckUserRequest;
+import com.example.digging.domain.network.request.SetLikeRequest;
 import com.example.digging.domain.network.request.UserApiRequest;
+import com.example.digging.domain.network.response.PostsResponse;
 import com.example.digging.domain.network.response.RecentDiggingResponse;
 import com.example.digging.domain.network.response.TotalTagResponse;
 import com.example.digging.domain.network.response.UserApiResponse;
+import com.example.digging.domain.repository.PostsRepository;
 import com.example.digging.domain.repository.TagsRepository;
+import com.example.digging.domain.repository.UserHasPostsRepository;
 import com.example.digging.domain.repository.UserRepository;
 import com.example.digging.ifs.CrudInterface;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +34,12 @@ public class UserApiLogicService implements CrudInterface<UserApiRequest, UserAp
 
     @Autowired
     private TagsRepository tagsRepository;
+
+    @Autowired
+    private PostsRepository postsRepository;
+
+    @Autowired
+    private UserHasPostsRepository userHasPostsRepository;
 
     @Override
     public Header<UserApiResponse> create(Header<UserApiRequest> request) {
@@ -51,8 +63,9 @@ public class UserApiLogicService implements CrudInterface<UserApiRequest, UserAp
 
     @Override
     public Header<UserApiResponse> read(Integer id) {
-        System.out.println(id);
+
         Optional<User> optional = userRepository.findById(id);
+        System.out.println(optional);
         return optional
                 .map(user -> response(user))
                 .orElseGet(
@@ -121,6 +134,27 @@ public class UserApiLogicService implements CrudInterface<UserApiRequest, UserAp
 
     }
 
+    public Header<PostsResponse> setLike(Header<SetLikeRequest> request) {
+
+        SetLikeRequest setLikeRequest = request.getData();
+
+        Optional<UserHasPosts> optional = userHasPostsRepository.findByUserIdAndPostsPostId(setLikeRequest.getUserId(), setLikeRequest.getPostId());
+
+        return optional
+                .map(opt -> {
+                    Posts posts = opt.getPosts();
+                    posts.setIsLike(!posts.getIsLike())
+                            .setUpdatedAt(LocalDateTime.now())
+                    ;
+                    return posts;
+                })
+                .map(posts -> postsRepository.save(posts))
+                .map(updatePost -> postres(updatePost))
+                .orElseGet(
+                        ()->Header.ERROR("데이터 없음")
+                );
+    }
+
     public Header<RecentDiggingResponse> getUserRecentDigging(Header<CheckUserRequest> request) {
         return null;
     }
@@ -140,6 +174,21 @@ public class UserApiLogicService implements CrudInterface<UserApiRequest, UserAp
 
         return Header.OK(userApiResponse);
 
+    }
+
+    private Header<PostsResponse> postres(Posts posts) {
+        PostsResponse postsResponse = PostsResponse.builder()
+                .postId(posts.getPostId())
+                .isText(posts.getIsText())
+                .isImg(posts.getIsImg())
+                .isLink(posts.getIsLink())
+                .isLike(posts.getIsLike())
+                .createdAt(posts.getCreatedAt())
+                .createdBy(posts.getCreatedBy())
+                .updatedAt(posts.getUpdatedAt())
+                .updatedBy(posts.getUpdatedBy())
+                .build();
+        return Header.OK(postsResponse);
     }
 
 }
