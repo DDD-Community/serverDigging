@@ -4,6 +4,7 @@ import com.example.digging.domain.entity.*;
 import com.example.digging.domain.network.Header;
 import com.example.digging.domain.network.request.PostLinkApiRequest;
 import com.example.digging.domain.network.response.PostLinkApiResponse;
+import com.example.digging.domain.network.response.PostLinkReadResponse;
 import com.example.digging.domain.repository.*;
 import com.example.digging.ifs.CrudInterface;
 import com.example.digging.util.UrlTypeValidation;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PostLinkApiLogicService implements CrudInterface<PostLinkApiRequest, PostLinkApiResponse> {
@@ -120,6 +122,33 @@ public class PostLinkApiLogicService implements CrudInterface<PostLinkApiRequest
         return null;
     }
 
+    public Header<PostLinkReadResponse> linkread(Integer userid, Integer postid) {
+
+        Optional<Posts> optional = postsRepository.findById(postid);
+        List<PostTag> postTag = postTagRepository.findAllByPostsPostId(postid);
+        System.out.println(userRepository.findById(userid).get().getUsername().equals(optional.get().getCreatedBy()));
+        try {
+            
+            if(!userRepository.findById(userid).get().getUsername().equals(optional.get().getCreatedBy())){
+                throw new Exception();
+            }
+            ArrayList<String> tagsarr = new ArrayList<String>();
+            int postTagNum = postTag.size();
+            System.out.println(postTagNum);
+            for(int i =0; i<postTagNum; i++) {
+                tagsarr.add(tagsRepository.findById(postTag.get(i).getTags().getTagId()).get().getTags());
+            }
+
+            return optional
+                    .map(post -> readres(postLinkRepository.findByPostsPostId(post.getPostId()),tagsarr))
+                    .orElseGet(() -> Header.ERROR("post 데이터 없음"));
+        } catch(Exception e) {
+            return Header.ERROR("user와 post id값 오류");
+        }
+
+
+    }
+
     @Override
     public Header<PostLinkApiResponse> update(Integer id, Header<PostLinkApiRequest> request) {
         return null;
@@ -128,6 +157,21 @@ public class PostLinkApiLogicService implements CrudInterface<PostLinkApiRequest
     @Override
     public Header delete(Integer id) {
         return null;
+    }
+
+    private Header<PostLinkReadResponse> readres(PostLink postLink, ArrayList<String> tags) {
+        PostLinkReadResponse postLinkReadResponse = PostLinkReadResponse.builder()
+                .postId(postLink.getPosts().getPostId())
+                .linkId(postLink.getLinkId())
+                .title(postLink.getTitle())
+                .url(postLink.getUrl())
+                .createdAt(postLink.getCreatedAt())
+                .createdBy(postLink.getCreatedBy())
+                .updatedAt(postLink.getUpdatedAt())
+                .updatedBy(postLink.getUpdatedBy())
+                .tags(tags)
+                .build();
+        return Header.OK(postLinkReadResponse);
     }
 
     private Header<PostLinkApiResponse> response(PostLink postLink, String valid, ArrayList<String> tags){

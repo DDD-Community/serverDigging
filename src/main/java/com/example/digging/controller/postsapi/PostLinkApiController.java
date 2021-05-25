@@ -4,16 +4,14 @@ import com.example.digging.domain.network.Header;
 import com.example.digging.domain.network.request.PostLinkApiRequest;
 import com.example.digging.domain.network.request.UserApiRequest;
 import com.example.digging.domain.network.response.PostLinkApiResponse;
+import com.example.digging.domain.network.response.PostLinkReadResponse;
 import com.example.digging.domain.network.response.UserApiResponse;
 import com.example.digging.ifs.CrudInterface;
 import com.example.digging.service.PostLinkApiLogicService;
 import com.example.digging.service.UserApiLogicService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -32,6 +30,12 @@ public class PostLinkApiController implements CrudInterface<PostLinkApiRequest, 
     @Override
     public Header<PostLinkApiResponse> read(Integer id) {
         return null;
+    }
+
+    @GetMapping("")
+    public Header<PostLinkReadResponse> linkread(@RequestParam(name = "userid") Integer userid, @RequestParam(name = "postid") Integer postid) {
+        log.info("[READ LINK] user {} : post {}", userid, postid);
+        return postLinkApiLogicService.linkread(userid, postid);
     }
 
     @Override
