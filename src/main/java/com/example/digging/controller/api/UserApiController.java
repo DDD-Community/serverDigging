@@ -49,9 +49,9 @@ public class UserApiController implements CrudInterface<UserApiRequest, UserApiR
     }
 
     @GetMapping("/get_total_tags")
-    public Header getUserTotalTags(@RequestBody Header<CheckUserRequest> request) {
-        log.info("user Total tags : {}", request);
-        return userApiLogicService.getUserTotalTags(request);
+    public Header getUserTotalTags(@RequestParam(name = "userid") Integer id) {
+        log.info("user Total tags : {}", id);
+        return userApiLogicService.getUserTotalTags(id);
     }
 
     @PutMapping("/set_like")

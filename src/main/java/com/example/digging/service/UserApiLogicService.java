@@ -111,9 +111,9 @@ public class UserApiLogicService implements CrudInterface<UserApiRequest, UserAp
 
     }
 
-    public Header<TotalTagResponse> getUserTotalTags(Header<CheckUserRequest> request) {
+    public Header<TotalTagResponse> getUserTotalTags(Integer id) {
 
-        List<Tags> userTagList = tagsRepository.findAllByUserId(request.getData().getId());
+        List<Tags> userTagList = tagsRepository.findAllByUserId(id);
         int userTagNum = userTagList.size();
         ArrayList<String> tagStr = new ArrayList<String>();
 
