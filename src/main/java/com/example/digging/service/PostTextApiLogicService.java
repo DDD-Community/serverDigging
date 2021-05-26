@@ -13,6 +13,7 @@ import com.example.digging.ifs.CrudInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Array;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -146,6 +147,30 @@ public class PostTextApiLogicService implements CrudInterface<PostTextApiRequest
 
     }
 
+    public Header<ArrayList<PostTextReadResponse>> alltextread(Integer userid) {
+        Optional<User> optional = userRepository.findById(userid);
+        List<UserHasPosts> userHasPosts = userHasPostsRepository.findAllByUserId(userid);
+        int userHasPostsNum = userHasPosts.size();
+
+        ArrayList<PostText> postTexts = new ArrayList<PostText>();
+        ArrayList<ArrayList> tags = new ArrayList();
+        for(int i =0; i<userHasPostsNum; i++){
+            if(userHasPosts.get(i).getPosts().getIsText() == Boolean.TRUE) {
+                postTexts.add(postTextRepository.findByPostsPostId(userHasPosts.get(i).getPosts().getPostId()));
+                List<PostTag> nowTags = postTagRepository.findAllByPostsPostId(userHasPosts.get(i).getPosts().getPostId());
+                int nowTagsSize = nowTags.size();
+                ArrayList<String> tagStr = new ArrayList<String>();
+                for(int j=0;j<nowTagsSize;j++){
+                    tagStr.add(nowTags.get(j).getTags().getTags());
+                }
+                tags.add(tagStr);
+            }
+        }
+        System.out.println(tags);
+        return optional.map(user -> allreadres(postTexts, tags)).orElseGet(()->Header.ERROR("없는 user"));
+
+    }
+
     private Header<PostTextApiResponse> response(PostText postText, ArrayList<String> tags){
 
         PostTextApiResponse postTextApiResponse = PostTextApiResponse.builder()
@@ -159,6 +184,31 @@ public class PostTextApiLogicService implements CrudInterface<PostTextApiRequest
 
         return Header.OK(postTextApiResponse);
 
+    }
+
+    private Header<ArrayList<PostTextReadResponse>> allreadres(ArrayList<PostText> postText, ArrayList<ArrayList> tags){
+
+        int postTextNum = postText.size();
+        ArrayList<PostTextReadResponse> postTextReadResponsesList = new ArrayList<PostTextReadResponse>();
+        ArrayList<PostTextReadResponse> ResponsesList = new ArrayList<PostTextReadResponse>();
+        for(int i=0; i<postTextNum;i++){
+            PostTextReadResponse postTextReadResponse = PostTextReadResponse.builder()
+                    .postId(postText.get(i).getPosts().getPostId())
+                    .textId(postText.get(i).getTextId())
+                    .title(postText.get(i).getTitle())
+                    .content(postText.get(i).getContent())
+                    .createdAt(postText.get(i).getCreatedAt())
+                    .createdBy(postText.get(i).getCreatedBy())
+                    .updatedAt(postText.get(i).getUpdatedAt())
+                    .updatedBy(postText.get(i).getUpdatedBy())
+                    .tags(tags.get(i))
+                    .build();
+
+            postTextReadResponsesList.add(postTextReadResponse);
+        }
+
+
+        return Header.OK(postTextReadResponsesList);
     }
 
     private Header<PostTextReadResponse> readres(PostText postText, ArrayList<String> tags) {

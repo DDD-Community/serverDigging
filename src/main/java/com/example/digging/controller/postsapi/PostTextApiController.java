@@ -12,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+
 @Slf4j
 @RestController
 @RequestMapping("/posttext")
@@ -41,6 +43,12 @@ public class PostTextApiController implements CrudInterface<PostTextApiRequest, 
     public Header<PostTextReadResponse> textread(@RequestParam(name = "userid") Integer userid, @RequestParam(name = "postid") Integer postid) {
         log.info("[READ Text] user {} : post {}", userid, postid);
         return postTextApiLogicService.textread(userid, postid);
+    }
+
+    @GetMapping("/all_text_read")
+    public Header<ArrayList<PostTextReadResponse>> alltextread(@RequestParam(name = "userid") Integer userid) {
+        log.info("[READ All Text] user {} : post {}", userid);
+        return postTextApiLogicService.alltextread(userid);
     }
 
     @Override
