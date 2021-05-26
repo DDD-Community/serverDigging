@@ -60,4 +60,10 @@ public class UserApiController implements CrudInterface<UserApiRequest, UserApiR
         return userApiLogicService.setLike(request);
     }
 
+    @GetMapping("/posts_num_bytype")
+    public Header getPostNumByType(@RequestParam(name = "userid") Integer id) {
+        log.info("[User {} ] Get Post Num By Type", id);
+        return userApiLogicService.getPostNumByType(id);
+    }
+
 }

@@ -8,10 +8,7 @@ import com.example.digging.domain.network.Header;
 import com.example.digging.domain.network.request.CheckUserRequest;
 import com.example.digging.domain.network.request.SetLikeRequest;
 import com.example.digging.domain.network.request.UserApiRequest;
-import com.example.digging.domain.network.response.PostsResponse;
-import com.example.digging.domain.network.response.RecentDiggingResponse;
-import com.example.digging.domain.network.response.TotalTagResponse;
-import com.example.digging.domain.network.response.UserApiResponse;
+import com.example.digging.domain.network.response.*;
 import com.example.digging.domain.repository.PostsRepository;
 import com.example.digging.domain.repository.TagsRepository;
 import com.example.digging.domain.repository.UserHasPostsRepository;
@@ -19,6 +16,7 @@ import com.example.digging.domain.repository.UserRepository;
 import com.example.digging.ifs.CrudInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
 
 import java.time.LocalDateTime;
@@ -155,8 +153,32 @@ public class UserApiLogicService implements CrudInterface<UserApiRequest, UserAp
                 );
     }
 
-    public Header<RecentDiggingResponse> getUserRecentDigging(Header<CheckUserRequest> request) {
-        return null;
+    public Header<GetPostNumByTypeResponse> getPostNumByType(Integer id) {
+
+        List<UserHasPosts> userHasPostsList = userHasPostsRepository.findAllByUserId(id);
+        int postsNum = userHasPostsList.size();
+        Integer textNum = 0; Integer imgNum = 0; Integer linkNum = 0;
+        for(int i=0;i<postsNum;i++){
+            if (userHasPostsList.get(i).getPosts().getIsText() == Boolean.TRUE) {textNum += 1;}
+            if (userHasPostsList.get(i).getPosts().getIsImg() == Boolean.TRUE) {imgNum += 1;}
+            if (userHasPostsList.get(i).getPosts().getIsLink() == Boolean.TRUE) {linkNum += 1;}
+        }
+
+        return numres(textNum, imgNum, linkNum, id);
+    }
+
+    private Header<GetPostNumByTypeResponse> numres(Integer text, Integer img, Integer link, Integer userid) {
+        Optional<User> user = userRepository.findById(userid);
+        String username = user.map(finduser -> finduser.getUsername()).orElseGet(()->"User Error");
+
+        GetPostNumByTypeResponse getPostNumByTypeResponse = GetPostNumByTypeResponse.builder()
+                .userName(username)
+                .totalText(text)
+                .totalImg(img)
+                .totalLink(link)
+                .build();
+
+        return Header.OK(getPostNumByTypeResponse);
     }
 
     private Header<UserApiResponse> response(User user){
