@@ -34,7 +34,6 @@ public class MainPageLogicService {
     @Autowired
     private PostTagRepository postTagRepository;
 
-    //<ArrayList<>>
     public Header<ArrayList<RecentDiggingResponse>> recentPostsRead(Integer userid) {
         Optional<User> optional = userRepository.findById(userid);
         List<UserHasPosts> userHasPostsList = userHasPostsRepository.findAllByUserId(userid);
@@ -58,32 +57,56 @@ public class MainPageLogicService {
         }
 
 
-        ArrayList responseList = new ArrayList();
         ArrayList<ArrayList> tags = new ArrayList();
         ArrayList<RecentDiggingResponse> recentDiggingList = new ArrayList<RecentDiggingResponse>();
         for(int i =0; i<userHasPostsNum; i++){
             if(orderPostsList.get(i).get().getIsLink() == Boolean.TRUE) {
-                responseList.add(postLinkRepository.findByPostsPostId(orderPostsList.get(i).get().getPostId()));
+                PostLink newlink = postLinkRepository.findByPostsPostId(orderPostsList.get(i).get().getPostId());
                 List<PostTag> nowTags = postTagRepository.findAllByPostsPostId(orderPostsList.get(i).get().getPostId());
                 int nowTagsSize = nowTags.size();
                 ArrayList<String> tagStr = new ArrayList<String>();
                 for(int j=0;j<nowTagsSize;j++){
                     tagStr.add(nowTags.get(j).getTags().getTags());
                 }
-                tags.add(tagStr);
+                RecentDiggingResponse makingResponse = RecentDiggingResponse.builder()
+                        .type("link")
+                        .postId(newlink.getPosts().getPostId())
+                        .linkId(newlink.getLinkId())
+                        .title(newlink.getTitle())
+                        .url(newlink.getUrl())
+                        .createdAt(newlink.getCreatedAt())
+                        .createdBy(newlink.getCreatedBy())
+                        .updatedAt(newlink.getUpdatedAt())
+                        .updatedBy(newlink.getUpdatedBy())
+                        .tags(tagStr)
+                        .build();
+                recentDiggingList.add(makingResponse);
             }
 
             if(orderPostsList.get(i).get().getIsText() == Boolean.TRUE) {
-                responseList.add(postTextRepository.findByPostsPostId(orderPostsList.get(i).get().getPostId()));
+                PostText newtext = postTextRepository.findByPostsPostId(orderPostsList.get(i).get().getPostId());
                 List<PostTag> nowTags = postTagRepository.findAllByPostsPostId(orderPostsList.get(i).get().getPostId());
                 int nowTagsSize = nowTags.size();
                 ArrayList<String> tagStr = new ArrayList<String>();
                 for(int j=0;j<nowTagsSize;j++){
                     tagStr.add(nowTags.get(j).getTags().getTags());
                 }
-                tags.add(tagStr);
+                RecentDiggingResponse makingResponse = RecentDiggingResponse.builder()
+                        .type("text")
+                        .postId(newtext.getPosts().getPostId())
+                        .textId(newtext.getTextId())
+                        .title(newtext.getTitle())
+                        .content(newtext.getContent())
+                        .createdAt(newtext.getCreatedAt())
+                        .createdBy(newtext.getCreatedBy())
+                        .updatedAt(newtext.getUpdatedAt())
+                        .updatedBy(newtext.getUpdatedBy())
+                        .tags(tagStr)
+                        .build();
+                recentDiggingList.add(makingResponse);
             }
         }
+
         ArrayList<RecentDiggingResponse> orderrecentDiggingList = new ArrayList<RecentDiggingResponse>();
         int number = recentDiggingList.size();
         if(number<=10){

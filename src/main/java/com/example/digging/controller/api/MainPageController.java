@@ -1,6 +1,7 @@
 package com.example.digging.controller.api;
 
 import com.example.digging.domain.network.Header;
+import com.example.digging.domain.network.response.RecentDiggingResponse;
 import com.example.digging.service.MainPageLogicService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,8 @@ public class MainPageController {
     MainPageLogicService mainPageLogicService;
 
     @GetMapping("/recent")
-    public Header recentPostsRead(Integer userid){
+    public Header<ArrayList<RecentDiggingResponse>> recentPostsRead(Integer userid){
+        log.info("[READ] User {} Recent Digging", userid);
         return mainPageLogicService.recentPostsRead(userid);
     }
 }
