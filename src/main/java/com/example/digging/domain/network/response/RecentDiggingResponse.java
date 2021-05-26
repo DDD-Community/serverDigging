@@ -24,6 +24,7 @@ public class RecentDiggingResponse {
     private LocalDateTime createdAt;
     private String createdBy;
     private LocalDateTime updatedAt;
+    private Boolean isLike;
     private String updatedBy;
     private ArrayList<String> tags;
 }

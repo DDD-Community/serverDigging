@@ -76,8 +76,9 @@ public class MainPageLogicService {
                         .url(newlink.getUrl())
                         .createdAt(newlink.getCreatedAt())
                         .createdBy(newlink.getCreatedBy())
-                        .updatedAt(newlink.getUpdatedAt())
+                        .updatedAt(newlink.getPosts().getUpdatedAt())
                         .updatedBy(newlink.getUpdatedBy())
+                        .isLike(newlink.getPosts().getIsLike())
                         .tags(tagStr)
                         .build();
                 recentDiggingList.add(makingResponse);
@@ -99,8 +100,9 @@ public class MainPageLogicService {
                         .content(newtext.getContent())
                         .createdAt(newtext.getCreatedAt())
                         .createdBy(newtext.getCreatedBy())
-                        .updatedAt(newtext.getUpdatedAt())
+                        .updatedAt(newtext.getPosts().getUpdatedAt())
                         .updatedBy(newtext.getUpdatedBy())
+                        .isLike(newtext.getPosts().getIsLike())
                         .tags(tagStr)
                         .build();
                 recentDiggingList.add(makingResponse);

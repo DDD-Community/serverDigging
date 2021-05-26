@@ -1,18 +1,12 @@
 package com.example.digging.service;
 
-import com.example.digging.domain.entity.Posts;
-import com.example.digging.domain.entity.Tags;
-import com.example.digging.domain.entity.User;
-import com.example.digging.domain.entity.UserHasPosts;
+import com.example.digging.domain.entity.*;
 import com.example.digging.domain.network.Header;
 import com.example.digging.domain.network.request.CheckUserRequest;
 import com.example.digging.domain.network.request.SetLikeRequest;
 import com.example.digging.domain.network.request.UserApiRequest;
 import com.example.digging.domain.network.response.*;
-import com.example.digging.domain.repository.PostsRepository;
-import com.example.digging.domain.repository.TagsRepository;
-import com.example.digging.domain.repository.UserHasPostsRepository;
-import com.example.digging.domain.repository.UserRepository;
+import com.example.digging.domain.repository.*;
 import com.example.digging.ifs.CrudInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,6 +29,12 @@ public class UserApiLogicService implements CrudInterface<UserApiRequest, UserAp
 
     @Autowired
     private PostsRepository postsRepository;
+
+    @Autowired
+    private PostTextRepository postTextRepository;
+
+    @Autowired
+    private PostLinkRepository postLinkRepository;
 
     @Autowired
     private UserHasPostsRepository userHasPostsRepository;
@@ -144,6 +144,15 @@ public class UserApiLogicService implements CrudInterface<UserApiRequest, UserAp
                     posts.setIsLike(!posts.getIsLike())
                             .setUpdatedAt(LocalDateTime.now())
                     ;
+                    if(posts.getIsText()==Boolean.TRUE){
+                        PostText postText = postTextRepository.findByPostsPostId(opt.getPosts().getPostId());
+                        postTextRepository.save(postText.setUpdatedAt(LocalDateTime.now()));
+                    }
+
+                    if(posts.getIsLink()==Boolean.TRUE){
+                        PostLink postLink = postLinkRepository.findByPostsPostId(opt.getPosts().getPostId());
+                        postLinkRepository.save(postLink.setUpdatedAt(LocalDateTime.now()));
+                    }
                     return posts;
                 })
                 .map(posts -> postsRepository.save(posts))
