@@ -207,8 +207,12 @@ public class PostTextApiLogicService implements CrudInterface<PostTextApiRequest
             postTextReadResponsesList.add(postTextReadResponse);
         }
 
+        ArrayList<PostTextReadResponse> responsesList = new ArrayList<PostTextReadResponse>();
+        for(int i=0;i<postTextNum;i++) {
+            responsesList.add(postTextReadResponsesList.get(postTextNum-i-1));
+        }
 
-        return Header.OK(postTextReadResponsesList);
+        return Header.OK(responsesList);
     }
 
     private Header<PostTextReadResponse> readres(PostText postText, ArrayList<String> tags) {
