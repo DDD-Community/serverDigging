@@ -165,10 +165,11 @@ public class PostLinkApiLogicService implements CrudInterface<PostLinkApiRequest
                 .linkId(postLink.getLinkId())
                 .title(postLink.getTitle())
                 .url(postLink.getUrl())
-                .createdAt(postLink.getCreatedAt())
+                .createdAt(postLink.getPosts().getCreatedAt())
                 .createdBy(postLink.getCreatedBy())
-                .updatedAt(postLink.getUpdatedAt())
+                .updatedAt(postLink.getPosts().getUpdatedAt())
                 .updatedBy(postLink.getUpdatedBy())
+                .isLike(postLink.getPosts().getIsLike())
                 .tags(tags)
                 .build();
         return Header.OK(postLinkReadResponse);
@@ -209,10 +210,11 @@ public class PostLinkApiLogicService implements CrudInterface<PostLinkApiRequest
                     .linkId(postLink.get(i).getLinkId())
                     .title(postLink.get(i).getTitle())
                     .url(postLink.get(i).getUrl())
-                    .createdAt(postLink.get(i).getCreatedAt())
+                    .createdAt(postLink.get(i).getPosts().getCreatedAt())
                     .createdBy(postLink.get(i).getCreatedBy())
-                    .updatedAt(postLink.get(i).getUpdatedAt())
+                    .updatedAt(postLink.get(i).getPosts().getUpdatedAt())
                     .updatedBy(postLink.get(i).getUpdatedBy())
+                    .isLike(postLink.get(i).getPosts().getIsLike())
                     .tags(tags.get(i))
                     .build();
 

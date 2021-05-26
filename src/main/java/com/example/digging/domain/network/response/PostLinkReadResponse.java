@@ -21,5 +21,6 @@ public class PostLinkReadResponse {
     private String createdBy;
     private LocalDateTime updatedAt;
     private String updatedBy;
+    private Boolean isLike;
     private ArrayList<String> tags;
 }

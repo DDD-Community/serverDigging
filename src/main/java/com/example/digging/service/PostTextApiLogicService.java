@@ -197,10 +197,11 @@ public class PostTextApiLogicService implements CrudInterface<PostTextApiRequest
                     .textId(postText.get(i).getTextId())
                     .title(postText.get(i).getTitle())
                     .content(postText.get(i).getContent())
-                    .createdAt(postText.get(i).getCreatedAt())
+                    .createdAt(postText.get(i).getPosts().getCreatedAt())
                     .createdBy(postText.get(i).getCreatedBy())
-                    .updatedAt(postText.get(i).getUpdatedAt())
+                    .updatedAt(postText.get(i).getPosts().getUpdatedAt())
                     .updatedBy(postText.get(i).getUpdatedBy())
+                    .isLike(postText.get(i).getPosts().getIsLike())
                     .tags(tags.get(i))
                     .build();
 
@@ -221,10 +222,11 @@ public class PostTextApiLogicService implements CrudInterface<PostTextApiRequest
                 .textId(postText.getTextId())
                 .title(postText.getTitle())
                 .content(postText.getContent())
-                .createdAt(postText.getCreatedAt())
+                .createdAt(postText.getPosts().getCreatedAt())
                 .createdBy(postText.getCreatedBy())
-                .updatedAt(postText.getUpdatedAt())
+                .updatedAt(postText.getPosts().getUpdatedAt())
                 .updatedBy(postText.getUpdatedBy())
+                .isLike(postText.getPosts().getIsLike())
                 .tags(tags)
                 .build();
         return Header.OK(postTextReadResponse);
