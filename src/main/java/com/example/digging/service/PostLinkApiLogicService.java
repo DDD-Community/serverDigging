@@ -5,6 +5,7 @@ import com.example.digging.domain.network.Header;
 import com.example.digging.domain.network.request.PostLinkApiRequest;
 import com.example.digging.domain.network.response.PostLinkApiResponse;
 import com.example.digging.domain.network.response.PostLinkReadResponse;
+import com.example.digging.domain.network.response.PostTextReadResponse;
 import com.example.digging.domain.repository.*;
 import com.example.digging.ifs.CrudInterface;
 import com.example.digging.util.UrlTypeValidation;
@@ -171,6 +172,59 @@ public class PostLinkApiLogicService implements CrudInterface<PostLinkApiRequest
                 .tags(tags)
                 .build();
         return Header.OK(postLinkReadResponse);
+    }
+
+    public Header<ArrayList<PostLinkReadResponse>> alllinkread(Integer userid) {
+        Optional<User> optional = userRepository.findById(userid);
+        List<UserHasPosts> userHasPosts = userHasPostsRepository.findAllByUserId(userid);
+        int userHasPostsNum = userHasPosts.size();
+
+        ArrayList<PostLink> postLinks = new ArrayList<PostLink>();
+        ArrayList<ArrayList> tags = new ArrayList();
+        for(int i =0; i<userHasPostsNum; i++){
+            if(userHasPosts.get(i).getPosts().getIsLink() == Boolean.TRUE) {
+                postLinks.add(postLinkRepository.findByPostsPostId(userHasPosts.get(i).getPosts().getPostId()));
+                List<PostTag> nowTags = postTagRepository.findAllByPostsPostId(userHasPosts.get(i).getPosts().getPostId());
+                int nowTagsSize = nowTags.size();
+                ArrayList<String> tagStr = new ArrayList<String>();
+                for(int j=0;j<nowTagsSize;j++){
+                    tagStr.add(nowTags.get(j).getTags().getTags());
+                }
+                tags.add(tagStr);
+            }
+        }
+        System.out.println(tags);
+        return optional.map(user -> allreadres(postLinks, tags)).orElseGet(()->Header.ERROR("없는 user"));
+
+    }
+
+    private Header<ArrayList<PostLinkReadResponse>> allreadres(ArrayList<PostLink> postLink, ArrayList<ArrayList> tags){
+
+        int postLinkNum = postLink.size();
+        ArrayList<PostLinkReadResponse> postLinkReadResponsesList = new ArrayList<PostLinkReadResponse>();
+
+        for(int i=0; i<postLinkNum;i++){
+            PostLinkReadResponse postLinkReadResponse = PostLinkReadResponse.builder()
+                    .postId(postLink.get(i).getPosts().getPostId())
+                    .linkId(postLink.get(i).getLinkId())
+                    .title(postLink.get(i).getTitle())
+                    .url(postLink.get(i).getUrl())
+                    .createdAt(postLink.get(i).getCreatedAt())
+                    .createdBy(postLink.get(i).getCreatedBy())
+                    .updatedAt(postLink.get(i).getUpdatedAt())
+                    .updatedBy(postLink.get(i).getUpdatedBy())
+                    .tags(tags.get(i))
+                    .build();
+
+            postLinkReadResponsesList.add(postLinkReadResponse);
+        }
+
+        ArrayList<PostLinkReadResponse> responsesList = new ArrayList<PostLinkReadResponse>();
+        for(int i=0;i<postLinkNum;i++) {
+            responsesList.add(postLinkReadResponsesList.get(postLinkNum-i-1));
+        }
+
+        return Header.OK(responsesList);
     }
 
     private Header<PostLinkApiResponse> response(PostLink postLink, String valid, ArrayList<String> tags){

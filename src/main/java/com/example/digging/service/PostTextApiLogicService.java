@@ -190,7 +190,7 @@ public class PostTextApiLogicService implements CrudInterface<PostTextApiRequest
 
         int postTextNum = postText.size();
         ArrayList<PostTextReadResponse> postTextReadResponsesList = new ArrayList<PostTextReadResponse>();
-        ArrayList<PostTextReadResponse> ResponsesList = new ArrayList<PostTextReadResponse>();
+
         for(int i=0; i<postTextNum;i++){
             PostTextReadResponse postTextReadResponse = PostTextReadResponse.builder()
                     .postId(postText.get(i).getPosts().getPostId())
