@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 @Data
@@ -13,6 +14,16 @@ import java.util.ArrayList;
 @AllArgsConstructor
 @Builder
 public class RecentDiggingResponse {
-    private int totalNum;
-    private ArrayList<Posts> totalTags;
+    private String type;
+    private Integer postId;
+    private Integer linkId;
+    private Integer textId;
+    private String title;
+    private String url;
+    private String content;
+    private LocalDateTime createdAt;
+    private String createdBy;
+    private LocalDateTime updatedAt;
+    private String updatedBy;
+    private ArrayList<String> tags;
 }

@@ -181,6 +181,7 @@ public class UserApiLogicService implements CrudInterface<UserApiRequest, UserAp
         return Header.OK(getPostNumByTypeResponse);
     }
 
+
     private Header<UserApiResponse> response(User user){
         UserApiResponse userApiResponse = UserApiResponse.builder()
                 .id(user.getId())
