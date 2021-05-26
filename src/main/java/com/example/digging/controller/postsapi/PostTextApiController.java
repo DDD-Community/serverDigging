@@ -38,7 +38,7 @@ public class PostTextApiController implements CrudInterface<PostTextApiRequest, 
     }
 
     @GetMapping("")
-    public Header<PostTextReadResponse> linkread(@RequestParam(name = "userid") Integer userid, @RequestParam(name = "postid") Integer postid) {
+    public Header<PostTextReadResponse> textread(@RequestParam(name = "userid") Integer userid, @RequestParam(name = "postid") Integer postid) {
         log.info("[READ Text] user {} : post {}", userid, postid);
         return postTextApiLogicService.textread(userid, postid);
     }
