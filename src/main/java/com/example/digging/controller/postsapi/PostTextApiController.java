@@ -2,16 +2,15 @@ package com.example.digging.controller.postsapi;
 
 import com.example.digging.domain.network.Header;
 import com.example.digging.domain.network.request.PostTextApiRequest;
+import com.example.digging.domain.network.response.PostLinkReadResponse;
 import com.example.digging.domain.network.response.PostTextApiResponse;
+import com.example.digging.domain.network.response.PostTextReadResponse;
 import com.example.digging.ifs.CrudInterface;
 import com.example.digging.service.PostLinkApiLogicService;
 import com.example.digging.service.PostTextApiLogicService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -36,6 +35,12 @@ public class PostTextApiController implements CrudInterface<PostTextApiRequest, 
     @Override
     public Header<PostTextApiResponse> update(Integer id, Header<PostTextApiRequest> request) {
         return null;
+    }
+
+    @GetMapping("")
+    public Header<PostTextReadResponse> linkread(@RequestParam(name = "userid") Integer userid, @RequestParam(name = "postid") Integer postid) {
+        log.info("[READ Text] user {} : post {}", userid, postid);
+        return postTextApiLogicService.textread(userid, postid);
     }
 
     @Override

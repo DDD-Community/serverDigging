@@ -123,29 +123,28 @@ public class PostLinkApiLogicService implements CrudInterface<PostLinkApiRequest
     }
 
     public Header<PostLinkReadResponse> linkread(Integer userid, Integer postid) {
+        Optional<UserHasPosts> optional = userHasPostsRepository.findByUserIdAndPostsPostId(userid, postid);
+        ArrayList<String> tagList = new ArrayList<String>();
 
-        Optional<Posts> optional = postsRepository.findById(postid);
-        List<PostTag> postTag = postTagRepository.findAllByPostsPostId(postid);
-        System.out.println(userRepository.findById(userid).get().getUsername().equals(optional.get().getCreatedBy()));
-        try {
-            
-            if(!userRepository.findById(userid).get().getUsername().equals(optional.get().getCreatedBy())){
-                throw new Exception();
-            }
-            ArrayList<String> tagsarr = new ArrayList<String>();
-            int postTagNum = postTag.size();
-            System.out.println(postTagNum);
-            for(int i =0; i<postTagNum; i++) {
-                tagsarr.add(tagsRepository.findById(postTag.get(i).getTags().getTagId()).get().getTags());
-            }
-
-            return optional
-                    .map(post -> readres(postLinkRepository.findByPostsPostId(post.getPostId()),tagsarr))
-                    .orElseGet(() -> Header.ERROR("post 데이터 없음"));
-        } catch(Exception e) {
-            return Header.ERROR("user와 post id값 오류");
-        }
-
+        return optional
+                .map(opt -> {
+                    List<PostTag> tagopt = postTagRepository.findAllByPostsPostId(postid);
+                    int tagNum = tagopt.size();
+                    for(int i =0; i<tagNum; i++){
+                        tagList.add(tagopt.get(i).getTags().getTags());
+                    }
+                    Optional<PostLink> linkopt = Optional.ofNullable(postLinkRepository.findByPostsPostId(postid));
+                    return linkopt
+                            .map(posts -> {
+                                PostLink readPost = posts;
+                                return readres(readPost, tagList);
+                            })
+                            .orElseGet(() -> Header.ERROR("post 정보 없음")
+                            );
+                })
+                .orElseGet(
+                        ()->Header.ERROR("user id, post id 오류(데이터 없음)")
+                );
 
     }
 

@@ -5,7 +5,9 @@ import com.example.digging.domain.network.Header;
 import com.example.digging.domain.network.request.PostLinkApiRequest;
 import com.example.digging.domain.network.request.PostTextApiRequest;
 import com.example.digging.domain.network.response.PostLinkApiResponse;
+import com.example.digging.domain.network.response.PostLinkReadResponse;
 import com.example.digging.domain.network.response.PostTextApiResponse;
+import com.example.digging.domain.network.response.PostTextReadResponse;
 import com.example.digging.domain.repository.*;
 import com.example.digging.ifs.CrudInterface;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PostTextApiLogicService implements CrudInterface<PostTextApiRequest, PostTextApiResponse> {
@@ -118,6 +122,30 @@ public class PostTextApiLogicService implements CrudInterface<PostTextApiRequest
         return null;
     }
 
+    public Header<PostTextReadResponse> textread(Integer userid, Integer postid) {
+        Optional<UserHasPosts> optional = userHasPostsRepository.findByUserIdAndPostsPostId(userid, postid);
+        ArrayList<String> tagList = new ArrayList<String>();
+
+        return optional
+                .map(opt ->{
+                    List<PostTag> tagopt = postTagRepository.findAllByPostsPostId(postid);
+                    int tagNum = tagopt.size();
+                    for(int i = 0;i<tagNum;i++){
+                        tagList.add(tagopt.get(i).getTags().getTags());
+                    }
+                    Optional<PostText> textopt = Optional.ofNullable(postTextRepository.findByPostsPostId(postid));
+                    return textopt
+                            .map(posts -> {
+                                PostText readPost = posts;
+                                return readres(readPost, tagList);
+                            })
+                            .orElseGet(() -> Header.ERROR("post 정보 없음"));
+                })
+                .orElseGet(()-> Header.ERROR("user id, post id 오류(데이터 없음)"));
+
+
+    }
+
     private Header<PostTextApiResponse> response(PostText postText, ArrayList<String> tags){
 
         PostTextApiResponse postTextApiResponse = PostTextApiResponse.builder()
@@ -131,5 +159,20 @@ public class PostTextApiLogicService implements CrudInterface<PostTextApiRequest
 
         return Header.OK(postTextApiResponse);
 
+    }
+
+    private Header<PostTextReadResponse> readres(PostText postText, ArrayList<String> tags) {
+        PostTextReadResponse postTextReadResponse = PostTextReadResponse.builder()
+                .postId(postText.getPosts().getPostId())
+                .textId(postText.getTextId())
+                .title(postText.getTitle())
+                .content(postText.getContent())
+                .createdAt(postText.getCreatedAt())
+                .createdBy(postText.getCreatedBy())
+                .updatedAt(postText.getUpdatedAt())
+                .updatedBy(postText.getUpdatedBy())
+                .tags(tags)
+                .build();
+        return Header.OK(postTextReadResponse);
     }
 }
