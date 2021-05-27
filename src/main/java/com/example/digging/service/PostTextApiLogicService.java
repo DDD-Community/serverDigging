@@ -186,6 +186,7 @@ public class PostTextApiLogicService implements CrudInterface<PostTextApiRequest
 
         PostTextApiResponse postTextApiResponse = PostTextApiResponse.builder()
                 .resultCode("Success")
+                .type("text")
                 .userName(postText.getCreatedBy())
                 .postId(postText.getPosts().getPostId())
                 .textId(postText.getTextId())
@@ -206,6 +207,7 @@ public class PostTextApiLogicService implements CrudInterface<PostTextApiRequest
         for(int i=0; i<postTextNum;i++){
             PostTextReadResponse postTextReadResponse = PostTextReadResponse.builder()
                     .resultCode("Success")
+                    .type("text")
                     .postId(postText.get(i).getPosts().getPostId())
                     .textId(postText.get(i).getTextId())
                     .title(postText.get(i).getTitle())
@@ -232,6 +234,7 @@ public class PostTextApiLogicService implements CrudInterface<PostTextApiRequest
     private PostTextReadResponse readres(PostText postText, ArrayList<String> tags) {
         PostTextReadResponse postTextReadResponse = PostTextReadResponse.builder()
                 .resultCode("Success")
+                .type("text")
                 .postId(postText.getPosts().getPostId())
                 .textId(postText.getTextId())
                 .title(postText.getTitle())

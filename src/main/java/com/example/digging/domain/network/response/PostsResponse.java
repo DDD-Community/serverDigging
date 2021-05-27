@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 public class PostsResponse {
 
     private String resultCode;
+    private String type;
     private Integer postId;
     private Boolean isText;
     private Boolean isImg;

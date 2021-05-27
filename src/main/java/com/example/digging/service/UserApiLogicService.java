@@ -243,6 +243,17 @@ public class UserApiLogicService implements CrudInterface<UserApiRequest, UserAp
                 .updatedAt(posts.getUpdatedAt())
                 .updatedBy(posts.getUpdatedBy())
                 .build();
+        String typeStr = null;
+        if (postsResponse.getIsText() == Boolean.TRUE) {
+            typeStr = "text";
+        }
+        if (postsResponse.getIsImg() == Boolean.TRUE) {
+            typeStr = "img";
+        }
+        if (postsResponse.getIsLink() == Boolean.TRUE) {
+            typeStr = "link";
+        }
+        postsResponse.setType(typeStr);
         return postsResponse;
     }
 

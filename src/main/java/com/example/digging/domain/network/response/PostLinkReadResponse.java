@@ -15,6 +15,7 @@ import java.util.ArrayList;
 public class PostLinkReadResponse {
 
     private String resultCode;
+    private String type;
     private Integer postId;
     private Integer linkId;
     private String title;
