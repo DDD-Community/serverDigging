@@ -26,35 +26,35 @@ public class PostTextApiController implements CrudInterface<PostTextApiRequest, 
 
     @Override
     @PostMapping("")
-    public Header<PostTextApiResponse> create(@RequestBody Header<PostTextApiRequest> request) {
+    public PostTextApiResponse create(@RequestBody PostTextApiRequest request) {
         log.info("{}", request);
         return postTextApiLogicService.create(request);
     }
 
     @Override
-    public Header<PostTextApiResponse> read(Integer id) {
+    public PostTextApiResponse read(Integer id) {
         return null;
     }
 
     @Override
-    public Header<PostTextApiResponse> update(Integer id, Header<PostTextApiRequest> request) {
+    public PostTextApiResponse update(Integer id, PostTextApiRequest request) {
         return null;
     }
 
     @GetMapping("")
-    public Header<PostTextReadResponse> textread(@RequestParam(name = "userid") Integer userid, @RequestParam(name = "postid") Integer postid) {
+    public PostTextReadResponse textread(@RequestParam(name = "userid") Integer userid, @RequestParam(name = "postid") Integer postid) {
         log.info("[READ Text] user {} : post {}", userid, postid);
         return postTextApiLogicService.textread(userid, postid);
     }
 
     @GetMapping("/all_text_read")
-    public Header<ArrayList<PostTextReadResponse>> alltextread(@RequestParam(name = "userid") Integer userid) {
+    public ArrayList<PostTextReadResponse> alltextread(@RequestParam(name = "userid") Integer userid) {
         log.info("[READ All Text] user {} : post {}", userid);
         return postTextApiLogicService.alltextread(userid);
     }
 
     @Override
-    public Header delete(Integer id) {
+    public PostTextApiResponse delete(Integer id) {
         return null;
     }
 }

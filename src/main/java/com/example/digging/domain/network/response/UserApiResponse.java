@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class UserApiResponse {
+    private String resultCode;
     private Integer id;
     private String username;
     private String email;

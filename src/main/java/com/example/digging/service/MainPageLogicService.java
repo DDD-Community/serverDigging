@@ -34,7 +34,7 @@ public class MainPageLogicService {
     @Autowired
     private PostTagRepository postTagRepository;
 
-    public Header<ArrayList<RecentDiggingResponse>> recentPostsRead(Integer userid) {
+    public ArrayList<RecentDiggingResponse> recentPostsRead(Integer userid) {
         Optional<User> optional = userRepository.findById(userid);
         List<UserHasPosts> userHasPostsList = userHasPostsRepository.findAllByUserId(userid);
         int userHasPostsNum = userHasPostsList.size();
@@ -69,6 +69,7 @@ public class MainPageLogicService {
                     tagStr.add(nowTags.get(j).getTags().getTags());
                 }
                 RecentDiggingResponse makingResponse = RecentDiggingResponse.builder()
+                        .resultCode("Success")
                         .type("link")
                         .postId(newlink.getPosts().getPostId())
                         .linkId(newlink.getLinkId())
@@ -93,6 +94,7 @@ public class MainPageLogicService {
                     tagStr.add(nowTags.get(j).getTags().getTags());
                 }
                 RecentDiggingResponse makingResponse = RecentDiggingResponse.builder()
+                        .resultCode("Success")
                         .type("text")
                         .postId(newtext.getPosts().getPostId())
                         .textId(newtext.getTextId())
@@ -121,7 +123,13 @@ public class MainPageLogicService {
             }
         }
 
-        return optional.map(user -> Header.OK(orderrecentDiggingList)).orElseGet(()->Header.ERROR("user 없음"));
+        return optional.map(user -> orderrecentDiggingList)
+                .orElseGet(()->{
+                    ArrayList<RecentDiggingResponse> errorList = new ArrayList<RecentDiggingResponse>();
+                    RecentDiggingResponse error = RecentDiggingResponse.builder().resultCode("Error : User 없음").build();
+                    errorList.add(error);
+                    return errorList;
+        });
     }
 
     public static LinkedHashMap<Integer, LocalDateTime> sortMapByValue(Map<Integer, LocalDateTime> map) {

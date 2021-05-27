@@ -13,6 +13,8 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class PostLinkApiResponse {
+
+    private String resultCode;
     private String userName;
     private Integer postId;
     private Integer linkId;

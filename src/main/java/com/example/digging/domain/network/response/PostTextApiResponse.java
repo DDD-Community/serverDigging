@@ -12,6 +12,7 @@ import java.util.ArrayList;
 @AllArgsConstructor
 @Builder
 public class PostTextApiResponse {
+    private String resultCode;
     private String userName;
     private Integer postId;
     private Integer textId;

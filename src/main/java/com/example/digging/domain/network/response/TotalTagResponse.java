@@ -16,6 +16,7 @@ import java.util.Optional;
 @AllArgsConstructor
 @Builder
 public class TotalTagResponse {
+    private String resultCode;
     private int totalNum;
     private ArrayList<String> totalTags;
 }

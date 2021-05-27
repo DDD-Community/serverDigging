@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GetPostNumByTypeResponse {
+
+    private String resultCode;
     private String userName;
     private Integer totalText;
     private Integer totalImg;

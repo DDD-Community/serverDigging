@@ -45,8 +45,8 @@ public class PostLinkApiLogicService implements CrudInterface<PostLinkApiRequest
 
 
     @Override
-    public Header<PostLinkApiResponse> create(Header<PostLinkApiRequest> request) {
-        PostLinkApiRequest body = request.getData();
+    public PostLinkApiResponse create(PostLinkApiRequest request) {
+        PostLinkApiRequest body = request;
         String linkStirng = body.getUrl();
 
         String[] tags = body.getTagsArr();
@@ -114,16 +114,17 @@ public class PostLinkApiLogicService implements CrudInterface<PostLinkApiRequest
 
 
         }else{
-            return Header.ERROR("링크 주소 유효하지 않음");
+            PostLinkApiResponse error = PostLinkApiResponse.builder().resultCode("Error : 유효하지 않은 URL").build();
+            return error;
         }
     }
 
     @Override
-    public Header<PostLinkApiResponse> read(Integer id) {
+    public PostLinkApiResponse read(Integer id) {
         return null;
     }
 
-    public Header<PostLinkReadResponse> linkread(Integer userid, Integer postid) {
+    public PostLinkReadResponse linkread(Integer userid, Integer postid) {
         Optional<UserHasPosts> optional = userHasPostsRepository.findByUserIdAndPostsPostId(userid, postid);
         ArrayList<String> tagList = new ArrayList<String>();
 
@@ -140,27 +141,35 @@ public class PostLinkApiLogicService implements CrudInterface<PostLinkApiRequest
                                 PostLink readPost = posts;
                                 return readres(readPost, tagList);
                             })
-                            .orElseGet(() -> Header.ERROR("post 정보 없음")
+                            .orElseGet(() -> {
+                                PostLinkReadResponse error = PostLinkReadResponse.builder().resultCode("Error : post 정보 없음").build();
+                                return error;
+                                    }
                             );
                 })
                 .orElseGet(
-                        ()->Header.ERROR("user id, post id 오류(데이터 없음)")
+                        () -> {
+                            PostLinkReadResponse error = PostLinkReadResponse.builder().resultCode("Error : user id, post id 오류").build();
+                            return error;
+                        }
                 );
 
     }
 
     @Override
-    public Header<PostLinkApiResponse> update(Integer id, Header<PostLinkApiRequest> request) {
+    public PostLinkApiResponse update(Integer id, PostLinkApiRequest request) {
         return null;
     }
 
     @Override
-    public Header delete(Integer id) {
+    public PostLinkApiResponse delete(Integer id) {
         return null;
     }
 
-    private Header<PostLinkReadResponse> readres(PostLink postLink, ArrayList<String> tags) {
+
+    private PostLinkReadResponse readres(PostLink postLink, ArrayList<String> tags) {
         PostLinkReadResponse postLinkReadResponse = PostLinkReadResponse.builder()
+                .resultCode("Success")
                 .postId(postLink.getPosts().getPostId())
                 .linkId(postLink.getLinkId())
                 .title(postLink.getTitle())
@@ -172,10 +181,10 @@ public class PostLinkApiLogicService implements CrudInterface<PostLinkApiRequest
                 .isLike(postLink.getPosts().getIsLike())
                 .tags(tags)
                 .build();
-        return Header.OK(postLinkReadResponse);
+        return postLinkReadResponse;
     }
 
-    public Header<ArrayList<PostLinkReadResponse>> alllinkread(Integer userid) {
+    public ArrayList<PostLinkReadResponse> alllinkread(Integer userid) {
         Optional<User> optional = userRepository.findById(userid);
         List<UserHasPosts> userHasPosts = userHasPostsRepository.findAllByUserId(userid);
         int userHasPostsNum = userHasPosts.size();
@@ -195,17 +204,24 @@ public class PostLinkApiLogicService implements CrudInterface<PostLinkApiRequest
             }
         }
         System.out.println(tags);
-        return optional.map(user -> allreadres(postLinks, tags)).orElseGet(()->Header.ERROR("없는 user"));
+        return optional.map(user -> allreadres(postLinks, tags))
+                .orElseGet(()->{
+                    ArrayList<PostLinkReadResponse> errorList = new ArrayList<PostLinkReadResponse>();
+                    PostLinkReadResponse error = PostLinkReadResponse.builder().resultCode("Error").build();
+                    errorList.add(error);
+                    return errorList;
+                });
 
     }
 
-    private Header<ArrayList<PostLinkReadResponse>> allreadres(ArrayList<PostLink> postLink, ArrayList<ArrayList> tags){
+    private ArrayList<PostLinkReadResponse> allreadres(ArrayList<PostLink> postLink, ArrayList<ArrayList> tags){
 
         int postLinkNum = postLink.size();
         ArrayList<PostLinkReadResponse> postLinkReadResponsesList = new ArrayList<PostLinkReadResponse>();
 
         for(int i=0; i<postLinkNum;i++){
             PostLinkReadResponse postLinkReadResponse = PostLinkReadResponse.builder()
+                    .resultCode("Success")
                     .postId(postLink.get(i).getPosts().getPostId())
                     .linkId(postLink.get(i).getLinkId())
                     .title(postLink.get(i).getTitle())
@@ -226,12 +242,13 @@ public class PostLinkApiLogicService implements CrudInterface<PostLinkApiRequest
             responsesList.add(postLinkReadResponsesList.get(postLinkNum-i-1));
         }
 
-        return Header.OK(responsesList);
+        return responsesList;
     }
 
-    private Header<PostLinkApiResponse> response(PostLink postLink, String valid, ArrayList<String> tags){
+    private PostLinkApiResponse response(PostLink postLink, String valid, ArrayList<String> tags){
 
         PostLinkApiResponse postLinkApiResponse = PostLinkApiResponse.builder()
+                .resultCode("Success")
                 .userName(postLink.getCreatedBy())
                 .postId(postLink.getPosts().getPostId())
                 .linkId(postLink.getLinkId())
@@ -240,7 +257,7 @@ public class PostLinkApiLogicService implements CrudInterface<PostLinkApiRequest
                 .newTags(tags)
                 .build();
 
-        return Header.OK(postLinkApiResponse);
+        return postLinkApiResponse;
 
     }
 }

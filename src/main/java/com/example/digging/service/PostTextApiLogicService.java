@@ -42,8 +42,8 @@ public class PostTextApiLogicService implements CrudInterface<PostTextApiRequest
 
 
     @Override
-    public Header<PostTextApiResponse> create(Header<PostTextApiRequest> request) {
-        PostTextApiRequest body = request.getData();
+    public PostTextApiResponse create(PostTextApiRequest request) {
+        PostTextApiRequest body = request;
 
         String[] tags = body.getTagsArr();
         ArrayList<String> newTagList = new ArrayList<String>();
@@ -109,21 +109,21 @@ public class PostTextApiLogicService implements CrudInterface<PostTextApiRequest
     }
 
     @Override
-    public Header<PostTextApiResponse> read(Integer id) {
+    public PostTextApiResponse read(Integer id) {
         return null;
     }
 
     @Override
-    public Header<PostTextApiResponse> update(Integer id, Header<PostTextApiRequest> request) {
+    public PostTextApiResponse update(Integer id, PostTextApiRequest request) {
         return null;
     }
 
     @Override
-    public Header delete(Integer id) {
+    public PostTextApiResponse delete(Integer id) {
         return null;
     }
 
-    public Header<PostTextReadResponse> textread(Integer userid, Integer postid) {
+    public PostTextReadResponse textread(Integer userid, Integer postid) {
         Optional<UserHasPosts> optional = userHasPostsRepository.findByUserIdAndPostsPostId(userid, postid);
         ArrayList<String> tagList = new ArrayList<String>();
 
@@ -140,14 +140,20 @@ public class PostTextApiLogicService implements CrudInterface<PostTextApiRequest
                                 PostText readPost = posts;
                                 return readres(readPost, tagList);
                             })
-                            .orElseGet(() -> Header.ERROR("post 정보 없음"));
+                            .orElseGet(() -> {
+                                PostTextReadResponse error = PostTextReadResponse.builder().resultCode("Error : post 정보 없음").build();
+                                return error;
+                            });
                 })
-                .orElseGet(()-> Header.ERROR("user id, post id 오류(데이터 없음)"));
+                .orElseGet(()-> {
+                    PostTextReadResponse error = PostTextReadResponse.builder().resultCode("Error : user id, post id 오류").build();
+                    return error;
+                });
 
 
     }
 
-    public Header<ArrayList<PostTextReadResponse>> alltextread(Integer userid) {
+    public ArrayList<PostTextReadResponse> alltextread(Integer userid) {
         Optional<User> optional = userRepository.findById(userid);
         List<UserHasPosts> userHasPosts = userHasPostsRepository.findAllByUserId(userid);
         int userHasPostsNum = userHasPosts.size();
@@ -167,13 +173,19 @@ public class PostTextApiLogicService implements CrudInterface<PostTextApiRequest
             }
         }
         System.out.println(tags);
-        return optional.map(user -> allreadres(postTexts, tags)).orElseGet(()->Header.ERROR("없는 user"));
+        return optional.map(user -> allreadres(postTexts, tags)).orElseGet(()->{
+            ArrayList<PostTextReadResponse> errorList = new ArrayList<PostTextReadResponse>();
+            PostTextReadResponse error = PostTextReadResponse.builder().resultCode("Error").build();
+            errorList.add(error);
+            return errorList;
+        });
 
     }
 
-    private Header<PostTextApiResponse> response(PostText postText, ArrayList<String> tags){
+    private PostTextApiResponse response(PostText postText, ArrayList<String> tags){
 
         PostTextApiResponse postTextApiResponse = PostTextApiResponse.builder()
+                .resultCode("Success")
                 .userName(postText.getCreatedBy())
                 .postId(postText.getPosts().getPostId())
                 .textId(postText.getTextId())
@@ -182,17 +194,18 @@ public class PostTextApiLogicService implements CrudInterface<PostTextApiRequest
                 .newTags(tags)
                 .build();
 
-        return Header.OK(postTextApiResponse);
+        return postTextApiResponse;
 
     }
 
-    private Header<ArrayList<PostTextReadResponse>> allreadres(ArrayList<PostText> postText, ArrayList<ArrayList> tags){
+    private ArrayList<PostTextReadResponse> allreadres(ArrayList<PostText> postText, ArrayList<ArrayList> tags){
 
         int postTextNum = postText.size();
         ArrayList<PostTextReadResponse> postTextReadResponsesList = new ArrayList<PostTextReadResponse>();
 
         for(int i=0; i<postTextNum;i++){
             PostTextReadResponse postTextReadResponse = PostTextReadResponse.builder()
+                    .resultCode("Success")
                     .postId(postText.get(i).getPosts().getPostId())
                     .textId(postText.get(i).getTextId())
                     .title(postText.get(i).getTitle())
@@ -213,11 +226,12 @@ public class PostTextApiLogicService implements CrudInterface<PostTextApiRequest
             responsesList.add(postTextReadResponsesList.get(postTextNum-i-1));
         }
 
-        return Header.OK(responsesList);
+        return responsesList;
     }
 
-    private Header<PostTextReadResponse> readres(PostText postText, ArrayList<String> tags) {
+    private PostTextReadResponse readres(PostText postText, ArrayList<String> tags) {
         PostTextReadResponse postTextReadResponse = PostTextReadResponse.builder()
+                .resultCode("Success")
                 .postId(postText.getPosts().getPostId())
                 .textId(postText.getTextId())
                 .title(postText.getTitle())
@@ -229,6 +243,6 @@ public class PostTextApiLogicService implements CrudInterface<PostTextApiRequest
                 .isLike(postText.getPosts().getIsLike())
                 .tags(tags)
                 .build();
-        return Header.OK(postTextReadResponse);
+        return postTextReadResponse;
     }
 }
