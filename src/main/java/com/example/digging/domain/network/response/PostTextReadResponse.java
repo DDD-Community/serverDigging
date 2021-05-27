@@ -13,6 +13,7 @@ import java.util.ArrayList;
 @AllArgsConstructor
 @Builder
 public class PostTextReadResponse {
+    private String resultCode;
     private Integer postId;
     private Integer textId;
     private String title;

@@ -4,6 +4,7 @@ import com.example.digging.domain.entity.User;
 import com.example.digging.domain.entity.UserHasPosts;
 import com.example.digging.domain.network.Header;
 import com.example.digging.domain.network.request.UserHasPostsApiRequest;
+import com.example.digging.domain.network.response.UserApiResponse;
 import com.example.digging.domain.network.response.UserHasPostsApiResponse;
 import com.example.digging.domain.repository.PostsRepository;
 import com.example.digging.domain.repository.UserHasPostsRepository;
@@ -26,8 +27,8 @@ public class UserHasPostsApiLogicService implements CrudInterface<UserHasPostsAp
     private UserHasPostsRepository userHasPostsRepository;
 
     @Override
-    public Header<UserHasPostsApiResponse> create(Header<UserHasPostsApiRequest> request) {
-        UserHasPostsApiRequest body = request.getData();
+    public UserHasPostsApiResponse create(UserHasPostsApiRequest request) {
+        UserHasPostsApiRequest body = request;
 
         UserHasPosts userHasPosts = UserHasPosts.builder()
                 .user(userRepository.getOne(body.getUserId()))
@@ -38,34 +39,43 @@ public class UserHasPostsApiLogicService implements CrudInterface<UserHasPostsAp
     }
 
     @Override
-    public Header<UserHasPostsApiResponse> read(Integer id) {
+    public UserHasPostsApiResponse read(Integer id) {
         Optional<UserHasPosts> optional = userHasPostsRepository.findById(id);
         return optional
                 .map(userHasPosts -> response(userHasPosts))
-                .orElseGet(
-                        ()->Header.ERROR("데이터 없음")
+                .orElseGet(()->{
+
+                    UserHasPostsApiResponse error = UserHasPostsApiResponse.builder().resultCode("Error : 데이터 없음").build();
+                    return error;
+                        }
                 );
     }
 
     @Override
-    public Header<UserHasPostsApiResponse> update(Integer id, Header<UserHasPostsApiRequest> request) {
+    public UserHasPostsApiResponse update(Integer id, UserHasPostsApiRequest request) {
         return null;
     }
 
     @Override
-    public Header delete(Integer id) {
+    public UserHasPostsApiResponse delete(Integer id) {
         Optional<UserHasPosts> optional = userHasPostsRepository.findById(id);
         return optional
                 .map(userHasPosts -> {
                     userHasPostsRepository.delete(userHasPosts);
-                    return Header.OK();
+                    UserHasPostsApiResponse userApiResponse = UserHasPostsApiResponse.builder()
+                            .resultCode("Delete Success")
+                            .build();
+                    return userApiResponse;
                 })
                 .orElseGet(
-                        ()->Header.ERROR("데이터 없음")
+                        ()->{UserHasPostsApiResponse userApiResponse = UserHasPostsApiResponse.builder()
+                                .resultCode("Error : 데이터 없음")
+                                .build();
+                            return userApiResponse;}
                 );
     }
 
-    private Header<UserHasPostsApiResponse> response(UserHasPosts userHasPosts){
+    private UserHasPostsApiResponse response(UserHasPosts userHasPosts){
         String typeCheck = "";
         if (userHasPosts.getPosts().getIsImg() == Boolean.TRUE) {
             typeCheck = "Img";
@@ -84,6 +94,6 @@ public class UserHasPostsApiLogicService implements CrudInterface<UserHasPostsAp
                 .postsPostId(userHasPosts.getPosts().getPostId())
                 .postsType(typeCheck)
                 .build();
-        return Header.OK(body);
+        return body;
     }
 }

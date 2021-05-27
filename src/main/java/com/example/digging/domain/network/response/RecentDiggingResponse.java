@@ -14,6 +14,7 @@ import java.util.ArrayList;
 @AllArgsConstructor
 @Builder
 public class RecentDiggingResponse {
+    private String resultCode;
     private String type;
     private Integer postId;
     private Integer linkId;

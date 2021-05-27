@@ -1,5 +1,6 @@
 package com.example.digging.domain.network.response;
 
+import com.example.digging.domain.network.Header;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 @Builder
 public class PostsResponse {
 
+    private String resultCode;
     private Integer postId;
     private Boolean isText;
     private Boolean isImg;

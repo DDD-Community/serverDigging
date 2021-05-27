@@ -40,8 +40,8 @@ public class UserApiLogicService implements CrudInterface<UserApiRequest, UserAp
     private UserHasPostsRepository userHasPostsRepository;
 
     @Override
-    public Header<UserApiResponse> create(Header<UserApiRequest> request) {
-        UserApiRequest userApiRequest = request.getData();
+    public UserApiResponse create(UserApiRequest request) {
+        UserApiRequest userApiRequest = request;
 
         User user = User.builder()
                 .username(userApiRequest.getUsername())
@@ -60,20 +60,23 @@ public class UserApiLogicService implements CrudInterface<UserApiRequest, UserAp
     }
 
     @Override
-    public Header<UserApiResponse> read(Integer id) {
+    public UserApiResponse read(Integer id) {
 
         Optional<User> optional = userRepository.findById(id);
         System.out.println(optional);
         return optional
                 .map(user -> response(user))
                 .orElseGet(
-                        ()->Header.ERROR("데이터 없음")
+                        ()->{UserApiResponse userApiResponse = UserApiResponse.builder()
+                                .resultCode("Error : 데이터 없음")
+                                .build();
+                            return userApiResponse;}
                 );
     }
 
     @Override
-    public Header<UserApiResponse> update(Integer id, Header<UserApiRequest> request) {
-        UserApiRequest userApiRequest = request.getData();
+    public UserApiResponse update(Integer id, UserApiRequest request) {
+        UserApiRequest userApiRequest = request;
         Optional<User> optional = userRepository.findById(id);
         System.out.println(userApiRequest);
         System.out.println(optional);
@@ -88,28 +91,36 @@ public class UserApiLogicService implements CrudInterface<UserApiRequest, UserAp
                 .map(user -> userRepository.save(user))
                 .map(updateUser -> response(updateUser))
                 .orElseGet(
-                        ()->Header.ERROR("데이터 없음")
+                        ()->{UserApiResponse userApiResponse = UserApiResponse.builder()
+                                .resultCode("Error : 데이터 없음")
+                                .build();
+                            return userApiResponse;}
                 );
 
     }
 
     @Override
-    public Header delete(Integer id) {
+    public UserApiResponse delete(Integer id) {
 
         System.out.println(id);
         Optional<User> optional = userRepository.findById(id);
         return optional
                 .map(user -> {
                     userRepository.delete(user);
-                    return Header.OK();
+                    UserApiResponse userApiResponse = UserApiResponse.builder()
+                            .resultCode("Delete Success")
+                            .build();
+                    return userApiResponse;
                 })
-                .orElseGet(
-                        ()->Header.ERROR("데이터 없음")
+                .orElseGet(()->{UserApiResponse userApiResponse = UserApiResponse.builder()
+                        .resultCode("Error : 데이터 없음")
+                        .build();
+                    return userApiResponse;}
                 );
 
     }
 
-    public Header<TotalTagResponse> getUserTotalTags(Integer id) {
+    public TotalTagResponse getUserTotalTags(Integer id) {
 
         List<Tags> userTagList = tagsRepository.findAllByUserId(id);
         int userTagNum = userTagList.size();
@@ -121,20 +132,24 @@ public class UserApiLogicService implements CrudInterface<UserApiRequest, UserAp
 
         if (userTagNum>0){
             TotalTagResponse totalTagResponse = TotalTagResponse.builder()
+                    .resultCode("Success")
                     .totalNum(userTagNum)
                     .totalTags(tagStr)
                     .build();
-            return Header.OK(totalTagResponse);
+            return totalTagResponse;
         }else{
-            return Header.ERROR("태그 없음");
+            TotalTagResponse totalTagResponse = TotalTagResponse.builder()
+                    .resultCode("데이터 없음")
+                    .build();
+            return totalTagResponse;
         }
 
 
     }
 
-    public Header<PostsResponse> setLike(Header<SetLikeRequest> request) {
+    public PostsResponse setLike(SetLikeRequest request) {
 
-        SetLikeRequest setLikeRequest = request.getData();
+        SetLikeRequest setLikeRequest = request;
 
         Optional<UserHasPosts> optional = userHasPostsRepository.findByUserIdAndPostsPostId(setLikeRequest.getUserId(), setLikeRequest.getPostId());
 
@@ -158,11 +173,16 @@ public class UserApiLogicService implements CrudInterface<UserApiRequest, UserAp
                 .map(posts -> postsRepository.save(posts))
                 .map(updatePost -> postres(updatePost))
                 .orElseGet(
-                        ()->Header.ERROR("데이터 없음")
+                        ()->{
+                            PostsResponse errres = PostsResponse.builder()
+                                    .resultCode("데이터 없음")
+                                    .build();
+                            return errres;
+                        }
                 );
     }
 
-    public Header<GetPostNumByTypeResponse> getPostNumByType(Integer id) {
+    public GetPostNumByTypeResponse getPostNumByType(Integer id) {
 
         List<UserHasPosts> userHasPostsList = userHasPostsRepository.findAllByUserId(id);
         int postsNum = userHasPostsList.size();
@@ -176,23 +196,25 @@ public class UserApiLogicService implements CrudInterface<UserApiRequest, UserAp
         return numres(textNum, imgNum, linkNum, id);
     }
 
-    private Header<GetPostNumByTypeResponse> numres(Integer text, Integer img, Integer link, Integer userid) {
+    private GetPostNumByTypeResponse numres(Integer text, Integer img, Integer link, Integer userid) {
         Optional<User> user = userRepository.findById(userid);
         String username = user.map(finduser -> finduser.getUsername()).orElseGet(()->"User Error");
 
         GetPostNumByTypeResponse getPostNumByTypeResponse = GetPostNumByTypeResponse.builder()
+                .resultCode("Success")
                 .userName(username)
                 .totalText(text)
                 .totalImg(img)
                 .totalLink(link)
                 .build();
 
-        return Header.OK(getPostNumByTypeResponse);
+        return getPostNumByTypeResponse;
     }
 
 
-    private Header<UserApiResponse> response(User user){
+    private UserApiResponse response(User user){
         UserApiResponse userApiResponse = UserApiResponse.builder()
+                .resultCode("Success")
                 .id(user.getId())
                 .username(user.getUsername())
                 .email(user.getEmail())
@@ -204,12 +226,13 @@ public class UserApiLogicService implements CrudInterface<UserApiRequest, UserAp
                 .updatedAt(user.getUpdatedAt())
                 .build();
 
-        return Header.OK(userApiResponse);
+        return userApiResponse;
 
     }
 
-    private Header<PostsResponse> postres(Posts posts) {
+    private PostsResponse postres(Posts posts) {
         PostsResponse postsResponse = PostsResponse.builder()
+                .resultCode("Success")
                 .postId(posts.getPostId())
                 .isText(posts.getIsText())
                 .isImg(posts.getIsImg())
@@ -220,7 +243,7 @@ public class UserApiLogicService implements CrudInterface<UserApiRequest, UserAp
                 .updatedAt(posts.getUpdatedAt())
                 .updatedBy(posts.getUpdatedBy())
                 .build();
-        return Header.OK(postsResponse);
+        return postsResponse;
     }
 
 }

@@ -19,27 +19,26 @@ public class UserHasPostsApiController implements CrudInterface<UserHasPostsApiR
 
     @Override
     @PostMapping
-    public Header<UserHasPostsApiResponse> create(@RequestBody Header<UserHasPostsApiRequest> request) {
+    public UserHasPostsApiResponse create(@RequestBody UserHasPostsApiRequest request) {
 
         return userHasPostsApiLogicService.create(request);
     }
 
     @Override
     @GetMapping("/{id}")
-    public Header<UserHasPostsApiResponse> read(@PathVariable Integer id) {
+    public UserHasPostsApiResponse read(@PathVariable Integer id) {
         return userHasPostsApiLogicService.read(id);
     }
 
     @Override
     @PutMapping("/{id}")
-    public Header<UserHasPostsApiResponse> update(@PathVariable Integer id,@RequestBody Header<UserHasPostsApiRequest> request) {
+    public UserHasPostsApiResponse update(@PathVariable Integer id,@RequestBody UserHasPostsApiRequest request) {
         return null;
     }
 
     @Override
     @DeleteMapping("/{id}")
-    public Header delete(@PathVariable Integer id) {
-
+    public UserHasPostsApiResponse delete(@PathVariable Integer id) {
         return userHasPostsApiLogicService.delete(id);
     }
 }

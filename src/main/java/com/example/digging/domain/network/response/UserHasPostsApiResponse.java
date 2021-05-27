@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class UserHasPostsApiResponse {
-
+    private String resultCode;
     private Integer id;
     private Integer userId;
     private String userName;

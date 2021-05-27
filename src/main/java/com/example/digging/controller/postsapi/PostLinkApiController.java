@@ -25,35 +25,35 @@ public class PostLinkApiController implements CrudInterface<PostLinkApiRequest, 
 
     @Override
     @PostMapping("")
-    public Header<PostLinkApiResponse> create(@RequestBody Header<PostLinkApiRequest> request) {
+    public PostLinkApiResponse create(@RequestBody PostLinkApiRequest request) {
         log.info("{}", request);
         return postLinkApiLogicService.create(request);
     }
 
     @Override
-    public Header<PostLinkApiResponse> read(Integer id) {
+    public PostLinkApiResponse read(Integer id) {
         return null;
     }
 
     @GetMapping("")
-    public Header<PostLinkReadResponse> linkread(@RequestParam(name = "userid") Integer userid, @RequestParam(name = "postid") Integer postid) {
+    public PostLinkReadResponse linkread(@RequestParam(name = "userid") Integer userid, @RequestParam(name = "postid") Integer postid) {
         log.info("[READ LINK] user {} : post {}", userid, postid);
         return postLinkApiLogicService.linkread(userid, postid);
     }
 
     @GetMapping("/all_link_read")
-    public Header<ArrayList<PostLinkReadResponse>> alllinkread(@RequestParam(name = "userid") Integer userid) {
+    public ArrayList<PostLinkReadResponse> alllinkread(@RequestParam(name = "userid") Integer userid) {
         log.info("[READ All Link] user {} : post {}", userid);
         return postLinkApiLogicService.alllinkread(userid);
     }
 
     @Override
-    public Header<PostLinkApiResponse> update(Integer id, Header<PostLinkApiRequest> request) {
+    public PostLinkApiResponse update(Integer id, PostLinkApiRequest request) {
         return null;
     }
 
     @Override
-    public Header delete(Integer id) {
+    public PostLinkApiResponse delete(Integer id) {
         return null;
     }
 }
