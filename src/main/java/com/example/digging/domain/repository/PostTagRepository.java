@@ -11,4 +11,6 @@ import java.util.List;
 public interface PostTagRepository extends JpaRepository<PostTag, Integer> {
 
     List<PostTag> findAllByPostsPostId(Integer postid);
+
+    List<PostTag> findAllByTagsTagId(Integer tagId);
 }
