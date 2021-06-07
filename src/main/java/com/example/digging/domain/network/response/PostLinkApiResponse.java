@@ -15,6 +15,7 @@ import java.util.List;
 public class PostLinkApiResponse {
 
     private String resultCode;
+    private String type;
     private String userName;
     private Integer postId;
     private Integer linkId;

@@ -170,6 +170,7 @@ public class PostLinkApiLogicService implements CrudInterface<PostLinkApiRequest
     private PostLinkReadResponse readres(PostLink postLink, ArrayList<String> tags) {
         PostLinkReadResponse postLinkReadResponse = PostLinkReadResponse.builder()
                 .resultCode("Success")
+                .type("link")
                 .postId(postLink.getPosts().getPostId())
                 .linkId(postLink.getLinkId())
                 .title(postLink.getTitle())
@@ -222,6 +223,7 @@ public class PostLinkApiLogicService implements CrudInterface<PostLinkApiRequest
         for(int i=0; i<postLinkNum;i++){
             PostLinkReadResponse postLinkReadResponse = PostLinkReadResponse.builder()
                     .resultCode("Success")
+                    .type("link")
                     .postId(postLink.get(i).getPosts().getPostId())
                     .linkId(postLink.get(i).getLinkId())
                     .title(postLink.get(i).getTitle())
@@ -249,6 +251,7 @@ public class PostLinkApiLogicService implements CrudInterface<PostLinkApiRequest
 
         PostLinkApiResponse postLinkApiResponse = PostLinkApiResponse.builder()
                 .resultCode("Success")
+                .type("link")
                 .userName(postLink.getCreatedBy())
                 .postId(postLink.getPosts().getPostId())
                 .linkId(postLink.getLinkId())

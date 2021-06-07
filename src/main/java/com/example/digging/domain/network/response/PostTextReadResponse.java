@@ -14,6 +14,7 @@ import java.util.ArrayList;
 @Builder
 public class PostTextReadResponse {
     private String resultCode;
+    private String type;
     private Integer postId;
     private Integer textId;
     private String title;

@@ -31,6 +31,9 @@ public class UserApiLogicService implements CrudInterface<UserApiRequest, UserAp
     private PostsRepository postsRepository;
 
     @Autowired
+    private PostTagRepository postTagRepository;
+
+    @Autowired
     private PostTextRepository postTextRepository;
 
     @Autowired
@@ -120,6 +123,47 @@ public class UserApiLogicService implements CrudInterface<UserApiRequest, UserAp
 
     }
 
+    public PostsResponse deletePost(Integer userid, Integer postid) {
+
+        Optional<UserHasPosts> optional = userHasPostsRepository.findByUserIdAndPostsPostId(userid, postid);
+
+        return optional
+                .map(opt -> {
+                    Posts posts = opt.getPosts();
+
+                    List<PostTag> postTagList = posts.getPostTagList();
+                    postsRepository.delete(posts);
+                    userHasPostsRepository.delete(opt);
+
+                    for (int i =0; i<postTagList.size(); i++) {
+                        System.out.println("!!!");
+                        postTagRepository.delete(postTagList.get(i));
+                        if(postTagList.get(i).getTags().getPostTagList().isEmpty()){
+                            tagsRepository.delete(postTagList.get(i).getTags());
+                        }
+
+                    }
+
+
+                    PostsResponse postsResponse = PostsResponse.builder()
+                            .resultCode("Delete Success")
+                            .build();
+                    return postsResponse;
+
+
+                })
+                .orElseGet(
+                        ()->{
+                            PostsResponse erros = PostsResponse.builder()
+                                    .resultCode("Error : 데이터 없음")
+                                    .build();
+                            return erros;
+                        }
+                );
+
+
+    }
+
     public TotalTagResponse getUserTotalTags(Integer id) {
 
         List<Tags> userTagList = tagsRepository.findAllByUserId(id);
@@ -147,11 +191,9 @@ public class UserApiLogicService implements CrudInterface<UserApiRequest, UserAp
 
     }
 
-    public PostsResponse setLike(SetLikeRequest request) {
+    public PostsResponse setLike(Integer userid, Integer postid) {
 
-        SetLikeRequest setLikeRequest = request;
-
-        Optional<UserHasPosts> optional = userHasPostsRepository.findByUserIdAndPostsPostId(setLikeRequest.getUserId(), setLikeRequest.getPostId());
+        Optional<UserHasPosts> optional = userHasPostsRepository.findByUserIdAndPostsPostId(userid, postid);
 
         return optional
                 .map(opt -> {
@@ -243,6 +285,17 @@ public class UserApiLogicService implements CrudInterface<UserApiRequest, UserAp
                 .updatedAt(posts.getUpdatedAt())
                 .updatedBy(posts.getUpdatedBy())
                 .build();
+        String typeStr = null;
+        if (postsResponse.getIsText() == Boolean.TRUE) {
+            typeStr = "text";
+        }
+        if (postsResponse.getIsImg() == Boolean.TRUE) {
+            typeStr = "img";
+        }
+        if (postsResponse.getIsLink() == Boolean.TRUE) {
+            typeStr = "link";
+        }
+        postsResponse.setType(typeStr);
         return postsResponse;
     }
 

@@ -60,9 +60,9 @@ public class UserApiController implements CrudInterface<UserApiRequest, UserApiR
     }
 
     @PutMapping("/set_like")
-    public PostsResponse setLike(@RequestBody SetLikeRequest request) {
-        log.info("setLike : {}", request);
-        return userApiLogicService.setLike(request);
+    public PostsResponse setLike(@RequestParam(name = "userid") Integer userid, @RequestParam(name = "postid") Integer postid) {
+        log.info("setLike : {}", postid);
+        return userApiLogicService.setLike(userid, postid);
     }
 
     @GetMapping("/posts_num_bytype")
@@ -70,5 +70,12 @@ public class UserApiController implements CrudInterface<UserApiRequest, UserApiR
         log.info("[User {} ] Get Post Num By Type", id);
         return userApiLogicService.getPostNumByType(id);
     }
+
+    @DeleteMapping("/delete")
+    public PostsResponse deletePost(@RequestParam(name = "userid") Integer userid, @RequestParam(name = "postid") Integer postid) {
+        log.info("delete id : {}", postid);
+        return userApiLogicService.deletePost(userid, postid);
+    }
+
 
 }
