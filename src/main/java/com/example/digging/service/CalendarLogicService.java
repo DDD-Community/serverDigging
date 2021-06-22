@@ -1,7 +1,6 @@
 package com.example.digging.service;
 
-import com.example.digging.domain.entity.User;
-import com.example.digging.domain.entity.UserHasPosts;
+import com.example.digging.domain.entity.*;
 import com.example.digging.domain.network.response.CalendarResponse;
 import com.example.digging.domain.network.response.RecentDiggingResponse;
 import com.example.digging.domain.repository.*;
@@ -125,6 +124,7 @@ public class CalendarLogicService {
         int userHasPostsNum = userHasPostsList.size();
 
 
+
         for(int i=0;i<userHasPostsNum;i++){
             String formatDate = userHasPostsList.get(i).getPosts().getCreatedAt().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
             String y = formatDate.substring(0,4);
@@ -155,6 +155,101 @@ public class CalendarLogicService {
                     return errorList;
                 });
 
+    }
+
+    public ArrayList<RecentDiggingResponse> calendarpostread(Integer userid, String ymd){
+        Optional<User> optional = userRepository.findById(userid);
+        List<UserHasPosts> userHasPostsList = userHasPostsRepository.findAllByUserId(userid);
+        int userHasPostsNum = userHasPostsList.size();
+        ArrayList<Integer> postIdList = new ArrayList<Integer>();
+        for(int i =0; i<userHasPostsNum; i++){
+            postIdList.add(userHasPostsList.get(i).getPosts().getPostId());
+        }
+
+        ArrayList<Optional<Posts>> orderPostsList = new ArrayList<>();
+        String year = ymd.substring(0,4);
+        String month = ymd.substring(4,6);
+        String day = ymd.substring(6,8);
+        int validpost = 0;
+        for(int i =0; i<userHasPostsNum; i++){
+            String formatDate = postsRepository.findById(postIdList.get(i)).get().getCreatedAt().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+            String y = formatDate.substring(0,4);
+            String m = formatDate.substring(4,6);
+            String d = formatDate.substring(6,8);
+            
+            if(year.equals(y) && month.equals(m) && day.equals(d)){
+                orderPostsList.add(postsRepository.findById(postIdList.get(i)));
+                validpost += 1;
+            }
+
+        }
+
+
+
+        ArrayList<ArrayList> tags = new ArrayList();
+        ArrayList<RecentDiggingResponse> recentDiggingList = new ArrayList<RecentDiggingResponse>();
+        for(int i =0; i<validpost; i++){
+            if(orderPostsList.get(i).get().getIsLink() == Boolean.TRUE) {
+                PostLink newlink = postLinkRepository.findByPostsPostId(orderPostsList.get(i).get().getPostId());
+                List<PostTag> nowTags = postTagRepository.findAllByPostsPostId(orderPostsList.get(i).get().getPostId());
+                int nowTagsSize = nowTags.size();
+                ArrayList<String> tagStr = new ArrayList<String>();
+                for(int j=0;j<nowTagsSize;j++){
+                    tagStr.add(nowTags.get(j).getTags().getTags());
+                }
+                RecentDiggingResponse makingResponse = RecentDiggingResponse.builder()
+                        .resultCode("Success")
+                        .type("link")
+                        .postId(newlink.getPosts().getPostId())
+                        .linkId(newlink.getLinkId())
+                        .title(newlink.getTitle())
+                        .url(newlink.getUrl())
+                        .createdAt(newlink.getCreatedAt())
+                        .createdBy(newlink.getCreatedBy())
+                        .updatedAt(newlink.getPosts().getUpdatedAt())
+                        .updatedBy(newlink.getUpdatedBy())
+                        .isLike(newlink.getPosts().getIsLike())
+                        .tags(tagStr)
+                        .build();
+                recentDiggingList.add(makingResponse);
+            }
+
+            if(orderPostsList.get(i).get().getIsText() == Boolean.TRUE) {
+                PostText newtext = postTextRepository.findByPostsPostId(orderPostsList.get(i).get().getPostId());
+                List<PostTag> nowTags = postTagRepository.findAllByPostsPostId(orderPostsList.get(i).get().getPostId());
+                int nowTagsSize = nowTags.size();
+                ArrayList<String> tagStr = new ArrayList<String>();
+                for(int j=0;j<nowTagsSize;j++){
+                    tagStr.add(nowTags.get(j).getTags().getTags());
+                }
+                RecentDiggingResponse makingResponse = RecentDiggingResponse.builder()
+                        .resultCode("Success")
+                        .type("text")
+                        .postId(newtext.getPosts().getPostId())
+                        .textId(newtext.getTextId())
+                        .title(newtext.getTitle())
+                        .content(newtext.getContent())
+                        .createdAt(newtext.getCreatedAt())
+                        .createdBy(newtext.getCreatedBy())
+                        .updatedAt(newtext.getPosts().getUpdatedAt())
+                        .updatedBy(newtext.getUpdatedBy())
+                        .isLike(newtext.getPosts().getIsLike())
+                        .tags(tagStr)
+                        .build();
+                recentDiggingList.add(makingResponse);
+            }
+        }
+
+        int number = recentDiggingList.size();
+
+
+        return optional.map(user -> recentDiggingList)
+                .orElseGet(()->{
+                    ArrayList<RecentDiggingResponse> errorList = new ArrayList<RecentDiggingResponse>();
+                    RecentDiggingResponse error = RecentDiggingResponse.builder().resultCode("Error : User 없음").build();
+                    errorList.add(error);
+                    return errorList;
+                });
     }
 
 

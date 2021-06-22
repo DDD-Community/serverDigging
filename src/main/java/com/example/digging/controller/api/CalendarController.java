@@ -2,6 +2,7 @@ package com.example.digging.controller.api;
 
 import com.example.digging.domain.network.response.CalendarResponse;
 import com.example.digging.domain.network.response.PostLinkReadResponse;
+import com.example.digging.domain.network.response.RecentDiggingResponse;
 import com.example.digging.service.CalendarLogicService;
 import com.example.digging.service.PostLinkApiLogicService;
 import lombok.extern.slf4j.Slf4j;
@@ -21,9 +22,15 @@ public class CalendarController {
     @Autowired
     private CalendarLogicService CalendarService;
 
-    @GetMapping("/read")
-    public ArrayList<CalendarResponse> calendarread(@RequestParam(name = "userid") Integer userid, @RequestParam(name = "yearmonth") String yearmonth) {
-        log.info("[READ LINK] user {} : post {}", userid, yearmonth);
+    @GetMapping("/allcheck")
+    public ArrayList<CalendarResponse> calendarread(@RequestParam(name = "userid") Integer userid, @RequestParam(name = "yyyyMM") String yearmonth) {
+        log.info("[READ CALENDAR] user {} : yyyy-MM {}", userid, yearmonth);
         return CalendarService.calendarread(userid, yearmonth);
+    }
+
+    @GetMapping("/readdaypost")
+    public ArrayList<RecentDiggingResponse> calendarpostread(@RequestParam(name = "userid") Integer userid, @RequestParam(name = "yyyyMMdd") String ymd) {
+        log.info("[READ CALENDAR POST] user {} : yyyy-MM-dd {}", userid, ymd);
+        return CalendarService.calendarpostread(userid, ymd);
     }
 }
