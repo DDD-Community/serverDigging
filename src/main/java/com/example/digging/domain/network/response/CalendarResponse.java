@@ -18,8 +18,8 @@ public class CalendarResponse {
     private String resultCode;
     private String day;
     private LocalDate date;
-    private Integer is_link;
-    private Integer is_img;
-    private Integer is_text;
+    private Boolean is_link;
+    private Boolean is_img;
+    private Boolean is_text;
 
 }
