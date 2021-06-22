@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
+
 @Slf4j
 @RestController
 @RequestMapping("/calendar")
@@ -20,7 +22,7 @@ public class CalendarController {
     private CalendarLogicService CalendarService;
 
     @GetMapping("/read")
-    public CalendarResponse calendarread(@RequestParam(name = "userid") Integer userid, @RequestParam(name = "yearmonth") Integer yearmonth) {
+    public ArrayList<CalendarResponse> calendarread(@RequestParam(name = "userid") Integer userid, @RequestParam(name = "yearmonth") String yearmonth) {
         log.info("[READ LINK] user {} : post {}", userid, yearmonth);
         return CalendarService.calendarread(userid, yearmonth);
     }
