@@ -42,34 +42,50 @@ public class CalendarLogicService {
 
         Optional<User> optional = userRepository.findById(userid);
         ArrayList<CalendarResponse> calendarList = new ArrayList<CalendarResponse>();
-//        Calendar cal = Calendar.getInstance();
-//        String year = yearmonth.substring(0,3);
-//        String month = yearmonth.substring(4);
-//        cal.set(Integer.parseInt(year),Integer.parseInt(month),1);
-//        int dayofmonth = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
-//        System.out.println(dayofmonth);
-//        String dateform = yearmonth+"01";
-//
-//        String firstday = getDateDay(dateform, "yyyy-MM-dd");
-//        System.out.println(firstday);
+        Calendar cal = Calendar.getInstance();
+        String year = yearmonth.substring(0,3);
+        String month = yearmonth.substring(4);
+        cal.set(Integer.parseInt(year),Integer.parseInt(month)-1,1);
+        int dayofmonth = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
 
-        Calendar calendar = Calendar.getInstance();
+        String dateform = year+"-"+month+"-01";
 
-        //현재 날짜로 설정
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
+        String firstday = getDateDayName(dateform);
 
-        //현재 달의 시작일과 마지막일 구하기
-        int start = calendar.getActualMinimum(Calendar.DAY_OF_MONTH);
-        int end = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+        switch(firstday) {
+            case "monday":
+                calendarList.add(CalendarResponse.builder().date(null).id(1).build());
+                break;
+            case "tuesday":
+                for(int i=1; i<3;i++){
+                    calendarList.add(CalendarResponse.builder().date(null).id(i).build());
+                }
+                break;
+            case "wednesday":
+                for(int i =1; i<4;i++){
+                    calendarList.add(CalendarResponse.builder().date(null).id(i).build());
+                }
+                break;
+            case "thursday":
+                for(int i =1; i<5;i++){
+                    calendarList.add(CalendarResponse.builder().date(null).id(i).build());
+                }
+                break;
+            case "friday":
+                for(int i =1; i<6;i++){
+                    calendarList.add(CalendarResponse.builder().date(null).id(i).build());
+                }
+                break;
+            case "saturday":
+                for(int i =1; i<7;i++){
+                    calendarList.add(CalendarResponse.builder().date(null).id(i).build());
+                }
+                break;
+            default:
+                break;
+        }
 
-        //DateFormat에 맞춰 String에 담기
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.KOREA);
-        calendar.set(year, month, start);
-        String startdate =  dateFormat.format(calendar.getTime());
-        calendar.set(year, month, end);
-        String enddate = dateFormat.format(calendar.getTime());
 
         List<UserHasPosts> userHasPostsList = userHasPostsRepository.findAllByUserId(userid);
         int userHasPostsNum = userHasPostsList.size();
@@ -90,18 +106,19 @@ public class CalendarLogicService {
 
     }
 
-    public String getDateDay(String date, String dateType) throws Exception {
+
+
+    public static String getDateDayName(String date) throws Exception {
 
 
         String day = "" ;
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat(dateType) ;
-        Date nDate = dateFormat.parse(date) ;
-
-        Calendar cal = Calendar.getInstance() ;
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd") ;
+        java.util.Date nDate = dateFormat.parse(date);
+        Calendar cal = Calendar.getInstance();
         cal.setTime(nDate);
+        int dayNum = cal.get(Calendar.DAY_OF_WEEK);
 
-        int dayNum = cal.get(Calendar.DAY_OF_WEEK) ;
 
         switch(dayNum){
             case 1:
@@ -129,8 +146,8 @@ public class CalendarLogicService {
         }
 
 
-
         return day ;
     }
+
 
 }
