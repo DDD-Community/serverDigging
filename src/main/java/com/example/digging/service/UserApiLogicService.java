@@ -136,7 +136,6 @@ public class UserApiLogicService implements CrudInterface<UserApiRequest, UserAp
                     userHasPostsRepository.delete(opt);
 
                     for (int i =0; i<postTagList.size(); i++) {
-                        System.out.println("!!!");
                         postTagRepository.delete(postTagList.get(i));
                         if(postTagList.get(i).getTags().getPostTagList().isEmpty()){
                             tagsRepository.delete(postTagList.get(i).getTags());
