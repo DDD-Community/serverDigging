@@ -176,7 +176,7 @@ public class CalendarLogicService {
             String y = formatDate.substring(0,4);
             String m = formatDate.substring(4,6);
             String d = formatDate.substring(6,8);
-            
+
             if(year.equals(y) && month.equals(m) && day.equals(d)){
                 orderPostsList.add(postsRepository.findById(postIdList.get(i)));
                 validpost += 1;
