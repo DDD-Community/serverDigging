@@ -82,6 +82,22 @@ public class SwaggerConfig {
 
     }
 
+    @Bean
+    public Docket apiV5() {
+        version = "Calendar";
+        title = "Calendar API " + version;
+
+        return new Docket(DocumentationType.SWAGGER_2)
+                .useDefaultResponseMessages(false)
+                .groupName(version)
+                .select()
+                .apis(RequestHandlerSelectors.basePackage("com.example.digging.controller"))
+                .paths(PathSelectors.ant("/calendar/**"))
+                .build()
+                .apiInfo(apiInfo(title, version));
+
+    }
+
     private ApiInfo apiInfo(String title, String version) {
         return new ApiInfo(
                 title,
