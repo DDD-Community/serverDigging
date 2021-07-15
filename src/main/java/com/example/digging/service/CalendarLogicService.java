@@ -158,6 +158,133 @@ public class CalendarLogicService {
 
     }
 
+    @SneakyThrows
+    public CalendarHeader<ArrayList<CalendarResponse>> calendarread(Integer userid){
+
+        Optional<User> optional = userRepository.findById(userid);
+        ArrayList<CalendarResponse> calendarList = new ArrayList<CalendarResponse>();
+        Calendar cal = Calendar.getInstance();
+
+        Calendar today = Calendar.getInstance();
+
+        int y = today.get(Calendar.YEAR);
+        int m = today.get(Calendar.MONTH) + 1;
+
+        String year = Integer.toString(y);
+        String month = Integer.toString(m);
+        String day = "01";
+
+        cal.set(y,m-1,1);
+        int dayofmonth = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
+        String month_info = year + "." + month;
+        String dateform = year+"-"+month+"-01";
+        Integer idnum = 1;
+        String firstday = getDateDayName(dateform);
+        int plusnum;
+        switch(firstday) {
+            case "monday":
+                calendarList.add(CalendarResponse.builder().date(null).id(idnum).build());
+                idnum += 1;
+                plusnum = 1;
+                break;
+            case "tuesday":
+                for(int i=1; i<3;i++){
+                    calendarList.add(CalendarResponse.builder().date(null).id(i).build());
+                }
+                idnum += 2;
+                plusnum = 2;
+                break;
+            case "wednesday":
+                for(int i =1; i<4;i++){
+                    calendarList.add(CalendarResponse.builder().date(null).id(i).build());
+                }
+                idnum += 3;
+                plusnum = 3;
+                break;
+            case "thursday":
+                for(int i =1; i<5;i++){
+                    calendarList.add(CalendarResponse.builder().date(null).id(i).build());
+                }
+                idnum += 4;
+                plusnum = 4;
+                break;
+            case "friday":
+                for(int i =1; i<6;i++){
+                    calendarList.add(CalendarResponse.builder().date(null).id(i).build());
+                }
+                idnum += 5;
+                plusnum = 5;
+                break;
+            case "saturday":
+                for(int i =1; i<7;i++){
+                    calendarList.add(CalendarResponse.builder().date(null).id(i).build());
+                }
+                idnum += 6;
+                plusnum = 6;
+                break;
+            default:
+                plusnum = 0;
+                break;
+        }
+
+        for(int i=1;i<=dayofmonth;i++){
+            String form;
+            if(i<10){
+                form = year+"-"+month+"-0"+Integer.toString(i);
+            }else {
+                form = year+"-"+month+"-"+Integer.toString(i);
+            }
+
+            calendarList.add(CalendarResponse.builder()
+                    .date(LocalDate.of(Integer.parseInt(year), Integer.parseInt(month), i))
+                    .resultCode("Success")
+                    .day(getDateDayName(form))
+                    .id(idnum)
+                    .is_img(false)
+                    .is_link(false)
+                    .is_text(false)
+                    .build());
+
+            idnum += 1;
+        }
+
+        List<UserHasPosts> userHasPostsList = userHasPostsRepository.findAllByUserId(userid);
+        int userHasPostsNum = userHasPostsList.size();
+
+        System.out.println(userHasPostsNum);
+
+        for(int i=0;i<userHasPostsNum;i++){
+            String formatDate = userHasPostsList.get(i).getPosts().getCreatedAt().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+            String fy = formatDate.substring(0,4);
+            String fm = formatDate.substring(4,6);
+            String fd = formatDate.substring(6,8);
+            Integer dd = Integer.parseInt(fd);
+
+            if(year.equals(fy) && month.equals(fm)){
+
+                if(userHasPostsList.get(i).getPosts().getIsLink()==true){
+                    calendarList.get(plusnum+dd-1).setIs_link(true);
+                }
+                if(userHasPostsList.get(i).getPosts().getIsText()==true){
+                    calendarList.get(plusnum+dd-1).setIs_text(true);
+                }
+                if(userHasPostsList.get(i).getPosts().getIsImg()==true){
+                    calendarList.get(plusnum+dd-1).setIs_img(true);
+                }
+            }
+        }
+
+
+        return optional.map(user -> CalendarHeader.OK(month_info, calendarList))
+                .orElseGet(()->{
+                    ArrayList<CalendarResponse> errorList = new ArrayList<CalendarResponse>();
+                    CalendarResponse error = CalendarResponse.builder().resultCode("Error : User 없음").build();
+                    errorList.add(error);
+                    return CalendarHeader.OK(month_info, errorList);
+                });
+
+    }
+
     public ArrayList<RecentDiggingResponse> calendarpostread(Integer userid, String ymd){
         Optional<User> optional = userRepository.findById(userid);
         List<UserHasPosts> userHasPostsList = userHasPostsRepository.findAllByUserId(userid);
@@ -252,7 +379,6 @@ public class CalendarLogicService {
                     return errorList;
                 });
     }
-
 
 
     public static String getDateDayName(String date) throws Exception {

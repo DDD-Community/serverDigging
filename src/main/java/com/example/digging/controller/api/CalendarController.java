@@ -24,15 +24,23 @@ public class CalendarController {
     @Autowired
     private CalendarLogicService CalendarService;
 
-    @GetMapping("/allcheck")
-    public CalendarHeader<ArrayList<CalendarResponse>> calendarread(@RequestParam(name = "userid") Integer userid, @RequestParam(name = "yyyyMM") String yearmonth) {
+    @GetMapping(value = "/month/diggings", params = { "userid", "date" })
+    public CalendarHeader<ArrayList<CalendarResponse>> calendarread(@RequestParam(name = "userid") Integer userid, @RequestParam(name = "date") String yearmonth) {
         log.info("[READ CALENDAR] user {} : yyyy-MM {}", userid, yearmonth);
         return CalendarService.calendarread(userid, yearmonth);
     }
 
-    @GetMapping("/readdaypost")
+    @GetMapping(value = "/month/diggings", params = { "userid" })
+    public CalendarHeader<ArrayList<CalendarResponse>> calendarread(@RequestParam(name = "userid") Integer userid) {
+        log.info("[READ CALENDAR] user {} : yyyy-MM {}", userid);
+        return CalendarService.calendarread(userid);
+    }
+
+    @GetMapping("/day/diggings")
     public ArrayList<RecentDiggingResponse> calendarpostread(@RequestParam(name = "userid") Integer userid, @RequestParam(name = "yyyyMMdd") String ymd) {
         log.info("[READ CALENDAR POST] user {} : yyyy-MM-dd {}", userid, ymd);
         return CalendarService.calendarpostread(userid, ymd);
     }
+
+
 }
