@@ -172,8 +172,14 @@ public class CalendarLogicService {
         int m = today.get(Calendar.MONTH) + 1;
 
         String year = Integer.toString(y);
-        String month = Integer.toString(m);
-        String day = "01";
+        String month;
+
+        if (m<10){
+            month = "0" + Integer.toString(m);
+        }else {
+            month = Integer.toString(m);
+        }
+
 
         cal.set(y,m-1,1);
         int dayofmonth = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
@@ -408,16 +414,29 @@ public class CalendarLogicService {
 
         int yyyy = today.get(Calendar.YEAR);
         int mm = today.get(Calendar.MONTH) + 1;
+        int dd = today.get(Calendar.DATE);
         ArrayList<Optional<Posts>> orderPostsList = new ArrayList<>();
         String year = Integer.toString(yyyy);
-        String month = Integer.toString(mm);
-        String day = "01";
+        String month;
+        String day;
+        if (mm<10){
+            month = "0" + Integer.toString(mm);
+        }else {
+            month = Integer.toString(mm);
+        }
+        if (dd<10){
+            day = "0" + Integer.toString(dd);
+        }else {
+            day = Integer.toString(dd);
+        }
+        System.out.println(year + month + day);
         int validpost = 0;
         for(int i =0; i<userHasPostsNum; i++){
             String formatDate = postsRepository.findById(postIdList.get(i)).get().getCreatedAt().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
             String y = formatDate.substring(0,4);
             String m = formatDate.substring(4,6);
             String d = formatDate.substring(6,8);
+
 
             if(year.equals(y) && month.equals(m) && day.equals(d)){
                 orderPostsList.add(postsRepository.findById(postIdList.get(i)));
