@@ -16,15 +16,15 @@ import java.util.ArrayList;
 public class CalendarHeader<T> {
 
     //month_info
-    private String monthInfo;
+    private String dateInfo;
 
-    private T data;
+    private T diggingList;
 
     //OK
     public static <T> CalendarHeader<T> OK(String info,T data) {
         return (CalendarHeader<T>) CalendarHeader.builder()
-                .monthInfo(info)
-                .data(data)
+                .dateInfo(info)
+                .diggingList(data)
                 .build();
     }
 }
