@@ -50,6 +50,7 @@ public class CalendarLogicService {
         cal.set(Integer.parseInt(year),Integer.parseInt(month)-1,1);
         int dayofmonth = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
         String month_info = year + "." + month;
+
         String dateform = year+"-"+month+"-01";
         Integer idnum = 1;
         String firstday = getDateDayName(dateform);
@@ -176,7 +177,12 @@ public class CalendarLogicService {
 
         cal.set(y,m-1,1);
         int dayofmonth = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
-        String month_info = year + "." + month;
+        String month_info;
+        if (month.length()==1){
+            month_info = year + ".0" + month;
+        }else{
+            month_info = year + "." + month;
+        }
         String dateform = year+"-"+month+"-01";
         Integer idnum = 1;
         String firstday = getDateDayName(dateform);
