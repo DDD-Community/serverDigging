@@ -1,5 +1,6 @@
 package com.example.digging.controller.api;
 
+import com.example.digging.domain.network.CalendarHeader;
 import com.example.digging.domain.network.response.CalendarResponse;
 import com.example.digging.domain.network.response.PostLinkReadResponse;
 import com.example.digging.domain.network.response.RecentDiggingResponse;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 @Slf4j
@@ -23,7 +25,7 @@ public class CalendarController {
     private CalendarLogicService CalendarService;
 
     @GetMapping("/allcheck")
-    public ArrayList<CalendarResponse> calendarread(@RequestParam(name = "userid") Integer userid, @RequestParam(name = "yyyyMM") String yearmonth) {
+    public CalendarHeader<ArrayList<CalendarResponse>> calendarread(@RequestParam(name = "userid") Integer userid, @RequestParam(name = "yyyyMM") String yearmonth) {
         log.info("[READ CALENDAR] user {} : yyyy-MM {}", userid, yearmonth);
         return CalendarService.calendarread(userid, yearmonth);
     }

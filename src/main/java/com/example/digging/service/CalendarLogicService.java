@@ -1,6 +1,7 @@
 package com.example.digging.service;
 
 import com.example.digging.domain.entity.*;
+import com.example.digging.domain.network.CalendarHeader;
 import com.example.digging.domain.network.response.CalendarResponse;
 import com.example.digging.domain.network.response.RecentDiggingResponse;
 import com.example.digging.domain.repository.*;
@@ -39,7 +40,7 @@ public class CalendarLogicService {
     private UserHasPostsRepository userHasPostsRepository;
 
     @SneakyThrows
-    public ArrayList<CalendarResponse> calendarread(Integer userid, String yearmonth){
+    public CalendarHeader<ArrayList<CalendarResponse>> calendarread(Integer userid, String yearmonth){
 
         Optional<User> optional = userRepository.findById(userid);
         ArrayList<CalendarResponse> calendarList = new ArrayList<CalendarResponse>();
@@ -48,7 +49,7 @@ public class CalendarLogicService {
         String month = yearmonth.substring(4,6);
         cal.set(Integer.parseInt(year),Integer.parseInt(month)-1,1);
         int dayofmonth = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
-
+        String month_info = year + "." + month;
         String dateform = year+"-"+month+"-01";
         Integer idnum = 1;
         String firstday = getDateDayName(dateform);
@@ -147,12 +148,12 @@ public class CalendarLogicService {
         }
 
 
-        return optional.map(user -> calendarList)
+        return optional.map(user -> CalendarHeader.OK(month_info, calendarList))
                 .orElseGet(()->{
                     ArrayList<CalendarResponse> errorList = new ArrayList<CalendarResponse>();
                     CalendarResponse error = CalendarResponse.builder().resultCode("Error : User 없음").build();
                     errorList.add(error);
-                    return errorList;
+                    return CalendarHeader.OK(month_info, errorList);
                 });
 
     }
