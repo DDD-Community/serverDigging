@@ -36,10 +36,16 @@ public class CalendarController {
         return CalendarService.calendarread(userid);
     }
 
-    @GetMapping("/day/diggings")
-    public ArrayList<RecentDiggingResponse> calendarpostread(@RequestParam(name = "userid") Integer userid, @RequestParam(name = "yyyyMMdd") String ymd) {
+    @GetMapping(value = "/day/diggings", params = { "userid", "date" })
+    public ArrayList<RecentDiggingResponse> calendarpostread(@RequestParam(name = "userid") Integer userid, @RequestParam(name = "date") String ymd) {
         log.info("[READ CALENDAR POST] user {} : yyyy-MM-dd {}", userid, ymd);
         return CalendarService.calendarpostread(userid, ymd);
+    }
+
+    @GetMapping(value = "/day/diggings", params = { "userid" })
+    public ArrayList<RecentDiggingResponse> calendarpostread(@RequestParam(name = "userid") Integer userid) {
+        log.info("[READ CALENDAR POST] user {}", userid);
+        return CalendarService.calendarpostread(userid);
     }
 
 
