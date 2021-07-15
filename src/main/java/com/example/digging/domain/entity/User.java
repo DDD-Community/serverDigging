@@ -26,7 +26,9 @@ public class User {
     private String email;
     private String password;
     private String provider;
-    private String role;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
     private String interest;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -36,5 +38,15 @@ public class User {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
     private List<Tags> tagsList;
+
+//    public User update(String name, String picture) {
+//        this.name = name;
+//        this.picture = picture;
+//        return this;
+//    }
+
+    public String getRoleKey() {
+        return this.role.getKey();
+    }
 
 }

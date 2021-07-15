@@ -34,6 +34,10 @@ dependencies {
 
     // AWS S3
     compile group: 'org.springframework.cloud', name: 'spring-cloud-aws', version: '2.2.1.RELEASE', ext: 'pom'
+
+    // security + oauth2
+//    implementation 'org.springframework.boot:spring-boot-starter-security'
+//    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 }
 
 test {
