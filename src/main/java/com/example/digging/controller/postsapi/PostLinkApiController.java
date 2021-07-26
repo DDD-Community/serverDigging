@@ -10,6 +10,7 @@ import com.example.digging.domain.network.response.UserApiResponse;
 import com.example.digging.ifs.CrudInterface;
 import com.example.digging.service.PostLinkApiLogicService;
 import com.example.digging.service.UserApiLogicService;
+import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 @Slf4j
 @RestController
 @RequestMapping("/postlink")
+@Api
 public class PostLinkApiController implements CrudInterface<PostLinkApiRequest, PostLinkApiResponse> {
     @Autowired
     private PostLinkApiLogicService postLinkApiLogicService;

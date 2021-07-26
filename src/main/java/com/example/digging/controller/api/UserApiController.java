@@ -10,6 +10,7 @@ import com.example.digging.domain.network.response.TotalTagResponse;
 import com.example.digging.domain.network.response.UserApiResponse;
 import com.example.digging.ifs.CrudInterface;
 import com.example.digging.service.UserApiLogicService;
+import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequestMapping("/api/user")
+@Api
 public class UserApiController implements CrudInterface<UserApiRequest, UserApiResponse> {
 
     @Autowired
