@@ -51,7 +51,7 @@ public class UserApiLogicService implements CrudInterface<UserApiRequest, UserAp
                 .email(userApiRequest.getEmail())
                 .password(userApiRequest.getPassword())
                 .provider(userApiRequest.getProvider())
-                .role(Role.valueOf("ROLE_USER"))
+                .role("ROLE_GUEST")
                 .interest(userApiRequest.getInterest())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
@@ -86,7 +86,7 @@ public class UserApiLogicService implements CrudInterface<UserApiRequest, UserAp
 
         return optional
                 .map(user -> {
-                    user.setRole(Role.valueOf(userApiRequest.getRole()))
+                    user.setRole("ROLE_GUEST")
                             .setUpdatedAt(LocalDateTime.now())
                             ;
                     return user;

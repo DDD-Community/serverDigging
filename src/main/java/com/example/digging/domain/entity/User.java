@@ -26,9 +26,10 @@ public class User {
     private String email;
     private String password;
     private String provider;
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Role role;
+//    @Enumerated(EnumType.STRING)
+//    @Column(nullable = false)
+//    private Role role;
+    private String role;
     private String interest;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -45,8 +46,6 @@ public class User {
 //        return this;
 //    }
 
-    public String getRoleKey() {
-        return this.role.getKey();
-    }
+
 
 }
