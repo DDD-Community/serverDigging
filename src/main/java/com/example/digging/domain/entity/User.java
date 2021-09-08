@@ -6,6 +6,7 @@ import lombok.experimental.Accessors;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 
 @Data
@@ -23,7 +24,9 @@ public class User {
     private Integer id;
 
     //고유식별자
-    //private String oauthId;
+    private String oauthId;
+
+    private Boolean activated;
 
     private String username;
     private String email;
@@ -32,7 +35,7 @@ public class User {
 //    @Enumerated(EnumType.STRING)
 //    @Column(nullable = false)
 //    private Role role;
-    private String role;
+//    private String role;
     private String interest;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -42,6 +45,13 @@ public class User {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
     private List<Tags> tagsList;
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_authority",
+            joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
+            inverseJoinColumns = {@JoinColumn(name = "authority_role", referencedColumnName = "role")})
+    private Set<Authority> authority;
 
 //    public User update(String name, String picture) {
 //        this.name = name;

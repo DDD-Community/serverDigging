@@ -1,16 +1,12 @@
 package com.example.digging.service;
 
 import com.example.digging.domain.entity.*;
-import com.example.digging.domain.network.Header;
-import com.example.digging.domain.network.request.CheckUserRequest;
-import com.example.digging.domain.network.request.SetLikeRequest;
 import com.example.digging.domain.network.request.UserApiRequest;
 import com.example.digging.domain.network.response.*;
 import com.example.digging.domain.repository.*;
 import com.example.digging.ifs.CrudInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 
 
 import java.time.LocalDateTime;
@@ -51,7 +47,6 @@ public class UserApiLogicService implements CrudInterface<UserApiRequest, UserAp
                 .email(userApiRequest.getEmail())
                 .password(userApiRequest.getPassword())
                 .provider(userApiRequest.getProvider())
-                .role("ROLE_GUEST")
                 .interest(userApiRequest.getInterest())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
@@ -86,7 +81,7 @@ public class UserApiLogicService implements CrudInterface<UserApiRequest, UserAp
 
         return optional
                 .map(user -> {
-                    user.setRole("ROLE_GUEST")
+                    user.setAuthority("ROLE_GUEST")
                             .setUpdatedAt(LocalDateTime.now())
                             ;
                     return user;
@@ -261,7 +256,7 @@ public class UserApiLogicService implements CrudInterface<UserApiRequest, UserAp
                 .email(user.getEmail())
                 .password(user.getPassword())
                 .provider(user.getProvider())
-                .role(String.valueOf(user.getRole()))
+                .role(String.valueOf(user.getAuthority()))
                 .interest(user.getInterest())
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
