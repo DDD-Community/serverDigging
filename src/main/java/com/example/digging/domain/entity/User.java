@@ -49,8 +49,8 @@ public class User {
     @ManyToMany
     @JoinTable(
             name = "user_authority",
-            joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
-            inverseJoinColumns = {@JoinColumn(name = "authority_role", referencedColumnName = "role")})
+            joinColumns = {@JoinColumn(name = "id", referencedColumnName = "id")},
+            inverseJoinColumns = {@JoinColumn(name = "role", referencedColumnName = "role")})
     private Set<Authority> authority;
 
 //    public User update(String name, String picture) {
