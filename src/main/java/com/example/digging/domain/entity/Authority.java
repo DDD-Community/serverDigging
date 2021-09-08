@@ -15,8 +15,10 @@ import javax.persistence.Table;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "authority")
 public class Authority {
 
     @Id
-    private String role;
+    @Column(name = "authority_name")
+    private String authorityName;
 }

@@ -89,7 +89,7 @@ public class UserHasPostsApiLogicService implements CrudInterface<UserHasPostsAp
 
         UserHasPostsApiResponse body = UserHasPostsApiResponse.builder()
                 .id(userHasPosts.getId())
-                .userId(userHasPosts.getUser().getId())
+                .userId(userHasPosts.getUser().getUserId())
                 .userName(userHasPosts.getUser().getUsername())
                 .postsPostId(userHasPosts.getPosts().getPostId())
                 .postsType(typeCheck)

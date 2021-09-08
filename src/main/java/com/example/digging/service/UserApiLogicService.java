@@ -252,7 +252,7 @@ public class UserApiLogicService implements CrudInterface<UserApiRequest, UserAp
     private UserApiResponse response(User user){
         UserApiResponse userApiResponse = UserApiResponse.builder()
                 .resultCode("Success")
-                .id(user.getId())
+                .id(user.getUserId())
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .password(user.getPassword())

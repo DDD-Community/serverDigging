@@ -42,7 +42,7 @@ public class CalendarLogicService {
     @SneakyThrows
     public CalendarHeader<ArrayList<CalendarResponse>> calendarread(Integer userid, String yearmonth){
 
-        Optional<User> optional = userRepository.findById(userid);
+        Optional<User> optional = userRepository.findByUserId(userid);
         ArrayList<CalendarResponse> calendarList = new ArrayList<CalendarResponse>();
         Calendar cal = Calendar.getInstance();
         String year = yearmonth.substring(0,4);
@@ -162,7 +162,7 @@ public class CalendarLogicService {
     @SneakyThrows
     public CalendarHeader<ArrayList<CalendarResponse>> calendarread(Integer userid){
 
-        Optional<User> optional = userRepository.findById(userid);
+        Optional<User> optional = userRepository.findByUserId(userid);
         ArrayList<CalendarResponse> calendarList = new ArrayList<CalendarResponse>();
         Calendar cal = Calendar.getInstance();
 
@@ -298,7 +298,7 @@ public class CalendarLogicService {
     }
 
     public ArrayList<RecentDiggingResponse> calendarpostread(Integer userid, String ymd){
-        Optional<User> optional = userRepository.findById(userid);
+        Optional<User> optional = userRepository.findByUserId(userid);
         List<UserHasPosts> userHasPostsList = userHasPostsRepository.findAllByUserId(userid);
         int userHasPostsNum = userHasPostsList.size();
         ArrayList<Integer> postIdList = new ArrayList<Integer>();
@@ -403,7 +403,7 @@ public class CalendarLogicService {
     }
 
     public ArrayList<RecentDiggingResponse> calendarpostread(Integer userid){
-        Optional<User> optional = userRepository.findById(userid);
+        Optional<User> optional = userRepository.findByUserId(userid);
         List<UserHasPosts> userHasPostsList = userHasPostsRepository.findAllByUserId(userid);
         int userHasPostsNum = userHasPostsList.size();
         ArrayList<Integer> postIdList = new ArrayList<Integer>();

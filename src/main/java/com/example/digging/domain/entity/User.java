@@ -5,6 +5,7 @@ import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -21,7 +22,8 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    @Column(name = "user_id")
+    private Integer userId;
 
     //고유식별자
     private String oauthId;
@@ -32,10 +34,7 @@ public class User {
     private String email;
     private String password;
     private String provider;
-//    @Enumerated(EnumType.STRING)
-//    @Column(nullable = false)
-//    private Role role;
-//    private String role;
+
     private String interest;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -49,15 +48,14 @@ public class User {
     @ManyToMany
     @JoinTable(
             name = "user_authority",
-            joinColumns = {@JoinColumn(name = "id", referencedColumnName = "id")},
-            inverseJoinColumns = {@JoinColumn(name = "role", referencedColumnName = "role")})
-    private Set<Authority> authority;
+            joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "user_id")},
+            inverseJoinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "authority_name")})
+    private Set<Authority> authorities;
 
-//    public User update(String name, String picture) {
-//        this.name = name;
-//        this.picture = picture;
-//        return this;
-//    }
+    public boolean isActivated() {
+        return activated;
+    }
+
 
 
 

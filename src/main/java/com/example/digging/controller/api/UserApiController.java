@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/usertest")
 @Api
 public class UserApiController implements CrudInterface<UserApiRequest, UserApiResponse> {
 
