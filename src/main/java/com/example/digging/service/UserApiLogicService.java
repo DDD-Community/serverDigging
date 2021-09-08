@@ -121,7 +121,7 @@ public class UserApiLogicService implements CrudInterface<UserApiRequest, UserAp
 
     public PostsResponse deletePost(Integer userid, Integer postid) {
 
-        Optional<UserHasPosts> optional = userHasPostsRepository.findByUserIdAndPostsPostId(userid, postid);
+        Optional<UserHasPosts> optional = userHasPostsRepository.findByUser_UserIdAndPostsPostId(userid, postid);
 
         return optional
                 .map(opt -> {
@@ -161,7 +161,7 @@ public class UserApiLogicService implements CrudInterface<UserApiRequest, UserAp
 
     public TotalTagResponse getUserTotalTags(Integer id) {
 
-        List<Tags> userTagList = tagsRepository.findAllByUserId(id);
+        List<Tags> userTagList = tagsRepository.findAllByUser_UserId(id);
         int userTagNum = userTagList.size();
         ArrayList<String> tagStr = new ArrayList<String>();
 
@@ -188,7 +188,7 @@ public class UserApiLogicService implements CrudInterface<UserApiRequest, UserAp
 
     public PostsResponse setLike(Integer userid, Integer postid) {
 
-        Optional<UserHasPosts> optional = userHasPostsRepository.findByUserIdAndPostsPostId(userid, postid);
+        Optional<UserHasPosts> optional = userHasPostsRepository.findByUser_UserIdAndPostsPostId(userid, postid);
 
         return optional
                 .map(opt -> {
@@ -221,7 +221,7 @@ public class UserApiLogicService implements CrudInterface<UserApiRequest, UserAp
 
     public GetPostNumByTypeResponse getPostNumByType(Integer id) {
 
-        List<UserHasPosts> userHasPostsList = userHasPostsRepository.findAllByUserId(id);
+        List<UserHasPosts> userHasPostsList = userHasPostsRepository.findAllByUser_UserId(id);
         int postsNum = userHasPostsList.size();
         Integer textNum = 0; Integer imgNum = 0; Integer linkNum = 0;
         for(int i=0;i<postsNum;i++){

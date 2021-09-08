@@ -62,7 +62,7 @@ public class PostTextApiLogicService implements CrudInterface<PostTextApiRequest
 
         for (int i=0; i<tags.length; i++) {
             String checkTag = tags[i];
-            Tags existTag = tagsRepository.findByTagsAndUserId(checkTag, body.getUserId());
+            Tags existTag = tagsRepository.findByTagsAndUser_UserId(checkTag, body.getUserId());
             if (existTag != null){
                 PostTag postTag = PostTag.builder()
                         .posts(newPosts)
@@ -124,7 +124,7 @@ public class PostTextApiLogicService implements CrudInterface<PostTextApiRequest
     }
 
     public PostTextReadResponse textread(Integer userid, Integer postid) {
-        Optional<UserHasPosts> optional = userHasPostsRepository.findByUserIdAndPostsPostId(userid, postid);
+        Optional<UserHasPosts> optional = userHasPostsRepository.findByUser_UserIdAndPostsPostId(userid, postid);
         ArrayList<String> tagList = new ArrayList<String>();
 
         return optional
@@ -155,7 +155,7 @@ public class PostTextApiLogicService implements CrudInterface<PostTextApiRequest
 
     public ArrayList<PostTextReadResponse> alltextread(Integer userid) {
         Optional<User> optional = userRepository.findById(userid);
-        List<UserHasPosts> userHasPosts = userHasPostsRepository.findAllByUserId(userid);
+        List<UserHasPosts> userHasPosts = userHasPostsRepository.findAllByUser_UserId(userid);
         int userHasPostsNum = userHasPosts.size();
 
         ArrayList<PostText> postTexts = new ArrayList<PostText>();

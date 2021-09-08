@@ -36,7 +36,7 @@ public class MainPageLogicService {
 
     public ArrayList<RecentDiggingResponse> recentPostsRead(Integer userid) {
         Optional<User> optional = userRepository.findById(userid);
-        List<UserHasPosts> userHasPostsList = userHasPostsRepository.findAllByUserId(userid);
+        List<UserHasPosts> userHasPostsList = userHasPostsRepository.findAllByUser_UserId(userid);
         int userHasPostsNum = userHasPostsList.size();
         ArrayList<Integer> postIdList = new ArrayList<Integer>();
         for(int i =0; i<userHasPostsNum; i++){
