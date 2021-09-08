@@ -4,6 +4,7 @@ import com.example.digging.adapter.jwt.JwtFilter;
 import com.example.digging.adapter.jwt.TokenProvider;
 import com.example.digging.domain.network.LoginDto;
 import com.example.digging.domain.network.TokenDto;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +29,7 @@ public class AuthController {
         this.tokenProvider = tokenProvider;
         this.authenticationManagerBuilder = authenticationManagerBuilder;
     }
+
 
     @PostMapping("/authenticate")
     public ResponseEntity<TokenDto> authorize(@Valid @RequestBody LoginDto loginDto) {
