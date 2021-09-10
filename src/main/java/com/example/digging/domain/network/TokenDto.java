@@ -16,6 +16,6 @@ public class TokenDto {
 
     private String accessToken;
 
-    private Date accessTokenExpiresIn;
+    private LocalDateTime accessTokenExpiresIn;
     private String refreshToken;
 }

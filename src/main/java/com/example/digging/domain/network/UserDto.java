@@ -26,7 +26,6 @@ public class UserDto {
     //고유식별자
     private String oauthId;
 
-    private String refreshToken;
 
     @NotNull
     @Size(min = 3, max = 50)

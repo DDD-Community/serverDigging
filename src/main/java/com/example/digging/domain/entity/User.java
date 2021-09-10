@@ -39,7 +39,6 @@ public class User {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    private String refreshToken;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
     private List<UserHasPosts> userHasPostsList;

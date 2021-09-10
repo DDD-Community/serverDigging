@@ -1,6 +1,8 @@
 package com.example.digging.controller;
 
 import com.example.digging.domain.entity.User;
+import com.example.digging.domain.network.LoginDto;
+import com.example.digging.domain.network.TokenDto;
 import com.example.digging.domain.network.UserDto;
 import com.example.digging.service.UserService;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +30,16 @@ public class UserController {
             @Valid @RequestBody UserDto userDto
     ) {
         return ResponseEntity.ok(userService.signup(userDto));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<TokenDto> login(@RequestBody LoginDto loginDto) {
+        return ResponseEntity.ok(userService.login(loginDto));
+    }
+
+    @PostMapping(value = "/reissue", params = { "access_token", "refresh_token" })
+    public ResponseEntity<TokenDto> reissue(@RequestParam(name = "access_token") String access_token, @RequestParam(name = "refresh_token") String refresh_token) {
+        return ResponseEntity.ok(userService.reissue(access_token, refresh_token));
     }
 
     @GetMapping("/user")

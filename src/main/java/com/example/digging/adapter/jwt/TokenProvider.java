@@ -16,6 +16,8 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -68,10 +70,12 @@ public class TokenProvider implements InitializingBean {
                 .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
 
+        LocalDateTime localvaliditytime = LocalDateTime.ofInstant(validity.toInstant(), ZoneId.systemDefault());
+
         return TokenDto.builder()
                 .grantType("bearer")
                 .accessToken(accessToken)
-                .accessTokenExpiresIn(validity)
+                .accessTokenExpiresIn(localvaliditytime)
                 .refreshToken(refreshToken)
                 .build();
     }
@@ -85,6 +89,10 @@ public class TokenProvider implements InitializingBean {
                 .parseClaimsJws(token)
                 .getBody();
 
+        if (claims.get(AUTHORITIES_KEY) == null) {
+            throw new RuntimeException("권한 정보가 없는 토큰입니다.");
+        }
+
         Collection<? extends GrantedAuthority> authorities =
                 Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
                         .map(SimpleGrantedAuthority::new)
@@ -94,6 +102,7 @@ public class TokenProvider implements InitializingBean {
 
         return new UsernamePasswordAuthenticationToken(principal, token, authorities);
     }
+
 
     public boolean validateToken(String token) {
         try {
@@ -110,4 +119,5 @@ public class TokenProvider implements InitializingBean {
         }
         return false;
     }
+
 }
