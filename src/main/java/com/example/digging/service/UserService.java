@@ -8,11 +8,16 @@ import java.util.Optional;
 import com.example.digging.domain.entity.Authority;
 import com.example.digging.domain.entity.Tags;
 import com.example.digging.domain.entity.User;
+import com.example.digging.domain.network.TokenDto;
 import com.example.digging.domain.network.exception.DuplicateMemberException;
 import com.example.digging.domain.network.UserDto;
+import com.example.digging.domain.network.response.UserApiResponse;
 import com.example.digging.domain.repository.UserRepository;
 import com.example.digging.util.SecurityUtil;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,6 +67,7 @@ public class UserService {
 
         return userRepository.save(user);
     }
+
 
     @Transactional(readOnly = true)
     public Optional<User> getUserWithAuthorities(String username) {

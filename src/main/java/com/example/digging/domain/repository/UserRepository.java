@@ -17,4 +17,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     Optional<Object> findOneWithAuthoritiesByOauthId(String oauthId);
 
     List<User> findByUsernameStartsWith(String username);
+
+
+    Optional<User> findByUsername(String username);
 }

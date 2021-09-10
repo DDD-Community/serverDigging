@@ -1,5 +1,6 @@
 package com.example.digging.adapter.jwt;
 
+import com.example.digging.domain.network.TokenDto;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -29,7 +30,7 @@ public class TokenProvider implements InitializingBean {
 
     private final String secret;
     private final long tokenValidityInMilliseconds;
-
+    private final long refreshtokenValidityInMilliseconds;
     private Key key;
 
 
@@ -38,6 +39,7 @@ public class TokenProvider implements InitializingBean {
             @Value("${jwt.token-validity-in-seconds}") long tokenValidityInSeconds) {
         this.secret = secret;
         this.tokenValidityInMilliseconds = tokenValidityInSeconds * 1000;
+        this.refreshtokenValidityInMilliseconds = (tokenValidityInSeconds + 604800) * 1000;
     }
 
     @Override
@@ -46,7 +48,7 @@ public class TokenProvider implements InitializingBean {
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String createToken(Authentication authentication) {
+    public TokenDto createToken(Authentication authentication) {
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
@@ -54,13 +56,26 @@ public class TokenProvider implements InitializingBean {
         long now = (new Date()).getTime();
         Date validity = new Date(now + this.tokenValidityInMilliseconds);
 
-        return Jwts.builder()
+        String accessToken =  Jwts.builder()
                 .setSubject(authentication.getName())
                 .claim(AUTHORITIES_KEY, authorities)
                 .signWith(key, SignatureAlgorithm.HS512)
                 .setExpiration(validity)
                 .compact();
+
+        String refreshToken = Jwts.builder()
+                .setExpiration(new Date(now + this.refreshtokenValidityInMilliseconds))
+                .signWith(key, SignatureAlgorithm.HS512)
+                .compact();
+
+        return TokenDto.builder()
+                .grantType("bearer")
+                .accessToken(accessToken)
+                .accessTokenExpiresIn(validity)
+                .refreshToken(refreshToken)
+                .build();
     }
+
 
     public Authentication getAuthentication(String token) {
         Claims claims = Jwts

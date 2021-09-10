@@ -2,6 +2,9 @@ package com.example.digging.domain.network;
 
 import lombok.*;
 
+import java.time.LocalDateTime;
+import java.util.Date;
+
 @Getter
 @Setter
 @Builder
@@ -9,5 +12,10 @@ import lombok.*;
 @NoArgsConstructor
 public class TokenDto {
 
-    private String token;
+    private String grantType;
+
+    private String accessToken;
+
+    private Date accessTokenExpiresIn;
+    private String refreshToken;
 }
