@@ -42,6 +42,11 @@ dependencies {
     runtime group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.2'
     runtime group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.2'
 
+    // https://mvnrepository.com/artifact/com.nimbusds/nimbus-jose-jwt
+    implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '3.10'
+
+    implementation 'org.apache.httpcomponents:httpclient:4.5'
+
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 }
 

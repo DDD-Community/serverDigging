@@ -1,5 +1,6 @@
 package com.example.digging.controller;
 
+import com.example.digging.adapter.apple.AppleServiceImpl;
 import com.example.digging.domain.entity.User;
 import com.example.digging.domain.network.LoginDto;
 import com.example.digging.domain.network.TokenDto;
@@ -15,6 +16,7 @@ import javax.validation.Valid;
 @RequestMapping("/api")
 public class UserController {
     private final UserService userService;
+    private AppleServiceImpl appleImpl;
 
     public UserController(UserService userService) {
         this.userService = userService;
@@ -23,6 +25,11 @@ public class UserController {
     @GetMapping("/hello")
     public ResponseEntity<String> hello() {
         return ResponseEntity.ok("hello");
+    }
+
+    @GetMapping("/apple")
+    public String appleSUB(String id_token) {
+        return appleImpl.getAppleSUBIdentity(id_token);
     }
 
     @PostMapping("/signup")
