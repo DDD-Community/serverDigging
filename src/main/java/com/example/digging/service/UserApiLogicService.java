@@ -1,16 +1,12 @@
 package com.example.digging.service;
 
 import com.example.digging.domain.entity.*;
-import com.example.digging.domain.network.Header;
-import com.example.digging.domain.network.request.CheckUserRequest;
-import com.example.digging.domain.network.request.SetLikeRequest;
 import com.example.digging.domain.network.request.UserApiRequest;
 import com.example.digging.domain.network.response.*;
 import com.example.digging.domain.repository.*;
 import com.example.digging.ifs.CrudInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 
 
 import java.time.LocalDateTime;
@@ -51,7 +47,6 @@ public class UserApiLogicService implements CrudInterface<UserApiRequest, UserAp
                 .email(userApiRequest.getEmail())
                 .password(userApiRequest.getPassword())
                 .provider(userApiRequest.getProvider())
-                .role("ROLE_GUEST")
                 .interest(userApiRequest.getInterest())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
@@ -86,7 +81,8 @@ public class UserApiLogicService implements CrudInterface<UserApiRequest, UserAp
 
         return optional
                 .map(user -> {
-                    user.setRole("ROLE_GUEST")
+                      user
+//                          .setAuthority("ROLE_GUEST")
                             .setUpdatedAt(LocalDateTime.now())
                             ;
                     return user;
@@ -125,7 +121,7 @@ public class UserApiLogicService implements CrudInterface<UserApiRequest, UserAp
 
     public PostsResponse deletePost(Integer userid, Integer postid) {
 
-        Optional<UserHasPosts> optional = userHasPostsRepository.findByUserIdAndPostsPostId(userid, postid);
+        Optional<UserHasPosts> optional = userHasPostsRepository.findByUser_UserIdAndPostsPostId(userid, postid);
 
         return optional
                 .map(opt -> {
@@ -165,7 +161,7 @@ public class UserApiLogicService implements CrudInterface<UserApiRequest, UserAp
 
     public TotalTagResponse getUserTotalTags(Integer id) {
 
-        List<Tags> userTagList = tagsRepository.findAllByUserId(id);
+        List<Tags> userTagList = tagsRepository.findAllByUser_UserId(id);
         int userTagNum = userTagList.size();
         ArrayList<String> tagStr = new ArrayList<String>();
 
@@ -192,7 +188,7 @@ public class UserApiLogicService implements CrudInterface<UserApiRequest, UserAp
 
     public PostsResponse setLike(Integer userid, Integer postid) {
 
-        Optional<UserHasPosts> optional = userHasPostsRepository.findByUserIdAndPostsPostId(userid, postid);
+        Optional<UserHasPosts> optional = userHasPostsRepository.findByUser_UserIdAndPostsPostId(userid, postid);
 
         return optional
                 .map(opt -> {
@@ -225,7 +221,7 @@ public class UserApiLogicService implements CrudInterface<UserApiRequest, UserAp
 
     public GetPostNumByTypeResponse getPostNumByType(Integer id) {
 
-        List<UserHasPosts> userHasPostsList = userHasPostsRepository.findAllByUserId(id);
+        List<UserHasPosts> userHasPostsList = userHasPostsRepository.findAllByUser_UserId(id);
         int postsNum = userHasPostsList.size();
         Integer textNum = 0; Integer imgNum = 0; Integer linkNum = 0;
         for(int i=0;i<postsNum;i++){
@@ -256,12 +252,12 @@ public class UserApiLogicService implements CrudInterface<UserApiRequest, UserAp
     private UserApiResponse response(User user){
         UserApiResponse userApiResponse = UserApiResponse.builder()
                 .resultCode("Success")
-                .id(user.getId())
+                .id(user.getUserId())
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .password(user.getPassword())
                 .provider(user.getProvider())
-                .role(user.getRole())
+//                .role(String.valueOf(user.getAuthority()))
                 .interest(user.getInterest())
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())

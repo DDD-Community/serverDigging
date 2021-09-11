@@ -11,8 +11,8 @@ import java.util.Optional;
 @Repository
 public interface TagsRepository extends JpaRepository<Tags, Integer> {
 
-    Tags findByTagsAndUserId(String checkTag, Integer userId);
+    Tags findByTagsAndUser_UserId(String checkTag, Integer userId);
 
-    List<Tags> findAllByUserId(Integer id);
+    List<Tags> findAllByUser_UserId(Integer id);
 
 }

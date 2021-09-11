@@ -1,4 +1,4 @@
-package com.example.digging;
+package com.example.digging.adapter;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

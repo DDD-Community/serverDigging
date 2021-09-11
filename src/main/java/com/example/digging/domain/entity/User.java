@@ -5,7 +5,9 @@ import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 
 @Data
@@ -20,19 +22,23 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    @Column(name = "user_id")
+    private Integer userId;
+
+    //고유식별자
+    private String oauthId;
+
+    private Boolean activated;
 
     private String username;
     private String email;
     private String password;
     private String provider;
-//    @Enumerated(EnumType.STRING)
-//    @Column(nullable = false)
-//    private Role role;
-    private String role;
+
     private String interest;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
     private List<UserHasPosts> userHasPostsList;
@@ -40,11 +46,17 @@ public class User {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
     private List<Tags> tagsList;
 
-//    public User update(String name, String picture) {
-//        this.name = name;
-//        this.picture = picture;
-//        return this;
-//    }
+    @ManyToMany
+    @JoinTable(
+            name = "user_authority",
+            joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "user_id")},
+            inverseJoinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "authority_name")})
+    private Set<Authority> authorities;
+
+    public boolean isActivated() {
+        return activated;
+    }
+
 
 
 
