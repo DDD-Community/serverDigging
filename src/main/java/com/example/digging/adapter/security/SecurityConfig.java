@@ -5,6 +5,7 @@ import com.example.digging.adapter.jwt.JwtAuthenticationEntryPoint;
 import com.example.digging.adapter.jwt.JwtSecurityConfig;
 import com.example.digging.adapter.jwt.TokenProvider;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -17,6 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.filter.CorsFilter;
 
 @EnableWebSecurity
+@Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final TokenProvider tokenProvider;
@@ -73,6 +75,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/reissue").permitAll()
                 //회원가입(토큰없는상태에서요청들어옴)
                 .antMatchers("/api/signup").permitAll()
+                .antMatchers("/api").permitAll()
+                .antMatchers("/swagger-ui.html").permitAll()
 
                 .anyRequest().authenticated()
 

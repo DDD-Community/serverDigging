@@ -22,10 +22,6 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("/hello")
-    public ResponseEntity<String> hello() {
-        return ResponseEntity.ok("hello");
-    }
 
     @GetMapping("/apple")
     public String appleSUB(String id_token) {
