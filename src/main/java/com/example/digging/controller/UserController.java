@@ -11,6 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
@@ -47,13 +48,13 @@ public class UserController {
 
     @GetMapping("/user")
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
-    public ResponseEntity<User> getMyUserInfo() {
-        return ResponseEntity.ok(userService.getMyUserWithAuthorities().get());
+    public UserDto getMyUserInfo() {
+        return userService.getUserInfoWithAutorities();
     }
 
-    @GetMapping("/user/{username}")
-    @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<User> getUserInfo(@PathVariable String username) {
-        return ResponseEntity.ok(userService.getUserWithAuthorities(username).get());
-    }
+//    @GetMapping("/user/{username}")
+//    @PreAuthorize("hasAnyRole('ADMIN')")
+//    public ResponseEntity<User> getUserInfo(@PathVariable String username) {
+//        return ResponseEntity.ok(userService.getUserWithAuthorities(username).get());
+//    }
 }

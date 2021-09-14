@@ -143,9 +143,33 @@ public class UserService {
         return tokenDto;
     }
 
+
     @Transactional(readOnly = true)
-    public Optional<User> getUserWithAuthorities(String username) {
-        return userRepository.findOneWithAuthoritiesByUsername(username);
+    public UserDto getUserInfoWithAutorities() {
+
+        Optional<User> userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUsername);
+
+        RefreshToken refreshToken = refreshTokenRepository.findById(userInfo.get().getUsername())
+                .orElseThrow(() -> new RuntimeException("로그아웃 된 사용자입니다."));
+
+        return userInfo
+                .map(user -> {
+                    UserDto userDto = UserDto.builder()
+                            .email(user.getEmail())
+                            .interest(user.getInterest())
+                            .userId(user.getUserId())
+                            .oauthId(user.getOauthId())
+                            .username(user.getUsername())
+                            .provider(user.getProvider())
+                            .createdAt(user.getCreatedAt())
+                            .updatedAt(user.getUpdatedAt())
+                            .activated(user.getActivated())
+                            .refreshTokenCreatedAt(refreshToken.getCreatedAt())
+                            .refreshTokenUpdatedAt(refreshToken.getUpdatedAt())
+                            .build();
+                    return userDto;
+                })
+                .orElseThrow();
     }
 
     @Transactional(readOnly = true)
