@@ -1,5 +1,6 @@
 package com.example.digging.util;
 
+import com.example.digging.adapter.apple.TokenResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.RSASSAVerifier;
@@ -7,18 +8,22 @@ import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jwt.ReadOnlyJWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import java.util.Base64;
+import java.util.Base64.Decoder;
 
+
+import net.minidev.json.JSONObject;
 import org.springframework.stereotype.Component;
 
+import java.io.UnsupportedEncodingException;
 import java.security.interfaces.RSAPublicKey;
 import java.text.ParseException;
+import com.google.gson.Gson;
+
 import java.util.Date;
 
 @Component
 public class AppleUtil {
-
-    private static final String ISS = "https://appleid.apple.com";
-
 
     public boolean verifyIdentityToken(String id_token) {
 
@@ -68,5 +73,27 @@ public class AppleUtil {
         }
 
         return false;
+    }
+
+    public String decode(String token) {
+
+        String[] splitToken = token.split("\\.");
+        Decoder decoder = Base64.getDecoder();
+        byte[] decodedBytes = decoder.decode(splitToken[1]);
+
+        String decodedString = null;
+        try {
+            decodedString = new String(decodedBytes, "UTF-8");
+
+            Gson gsons = new Gson();
+
+            TokenResponse tokenResponse = gsons.fromJson(decodedString, TokenResponse.class);
+
+            return tokenResponse.getSub();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return decodedString;
+
     }
 }

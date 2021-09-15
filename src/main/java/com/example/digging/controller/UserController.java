@@ -6,6 +6,8 @@ import com.example.digging.domain.network.LoginDto;
 import com.example.digging.domain.network.TokenDto;
 import com.example.digging.domain.network.UserDto;
 import com.example.digging.service.UserService;
+import io.swagger.annotations.Api;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -13,20 +15,25 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.Optional;
 
+@Slf4j
+@Api
 @RestController
 @RequestMapping("/api")
 public class UserController {
     private final UserService userService;
-    private AppleServiceImpl appleImpl;
+    private final AppleServiceImpl appleImpl;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, AppleServiceImpl appleImpl) {
+
         this.userService = userService;
+        this.appleImpl = appleImpl;
     }
 
 
-    @GetMapping("/apple")
-    public String appleSUB(String id_token) {
-        return appleImpl.getAppleSUBIdentity(id_token);
+    @GetMapping(value = "/apple", params = { "id_token" })
+    public String appleSUB(@RequestParam(name = "id_token") String idToken) {
+        log.info(idToken);
+        return appleImpl.getAppleSUBIdentity(idToken);
     }
 
     @PostMapping("/signup")

@@ -19,4 +19,5 @@ public class DiggingController {
     public Header getHeader() {
         return Header.builder().resultCode("OK").description("OK").build();
     }
+
 }
