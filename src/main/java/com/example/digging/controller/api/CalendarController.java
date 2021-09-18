@@ -24,28 +24,28 @@ public class CalendarController {
     @Autowired
     private CalendarLogicService CalendarService;
 
-    @GetMapping(value = "/month/diggings", params = { "userid", "date" })
-    public CalendarHeader<ArrayList<CalendarResponse>> calendarread(@RequestParam(name = "userid") Integer userid, @RequestParam(name = "date") String yearmonth) {
-        log.info("[READ CALENDAR] user {} : yyyy-MM {}", userid, yearmonth);
-        return CalendarService.calendarread(userid, yearmonth);
+    @GetMapping(value = "/month/diggings", params = { "date" })
+    public CalendarHeader<ArrayList<CalendarResponse>> calendarread(@RequestParam(name = "date") String yearmonth) {
+        log.info("[READ CALENDAR] : yyyy-MM {}", yearmonth);
+        return CalendarService.calendarread(yearmonth);
     }
 
-    @GetMapping(value = "/month/diggings", params = { "userid" })
-    public CalendarHeader<ArrayList<CalendarResponse>> calendarread(@RequestParam(name = "userid") Integer userid) {
-        log.info("[READ CALENDAR] user {} : yyyy-MM {}", userid);
-        return CalendarService.calendarread(userid);
+    @GetMapping(value = "/month/diggings")
+    public CalendarHeader<ArrayList<CalendarResponse>> calendarread() {
+        log.info("[READ CALENDAR] : yyyy-MM {}");
+        return CalendarService.calendarread();
     }
 
-    @GetMapping(value = "/day/diggings", params = { "userid", "date" })
-    public ArrayList<RecentDiggingResponse> calendarpostread(@RequestParam(name = "userid") Integer userid, @RequestParam(name = "date") String ymd) {
-        log.info("[READ CALENDAR POST] user {} : yyyy-MM-dd {}", userid, ymd);
-        return CalendarService.calendarpostread(userid, ymd);
+    @GetMapping(value = "/day/diggings", params = { "date" })
+    public ArrayList<RecentDiggingResponse> calendarpostread(@RequestParam(name = "date") String ymd) {
+        log.info("[READ CALENDAR POST] : yyyy-MM-dd {}", ymd);
+        return CalendarService.calendarpostread(ymd);
     }
 
-    @GetMapping(value = "/day/diggings", params = { "userid" })
-    public ArrayList<RecentDiggingResponse> calendarpostread(@RequestParam(name = "userid") Integer userid) {
-        log.info("[READ CALENDAR POST] user {}", userid);
-        return CalendarService.calendarpostread(userid);
+    @GetMapping(value = "/day/diggings")
+    public ArrayList<RecentDiggingResponse> calendarpostread() {
+        log.info("[READ CALENDAR POST]" );
+        return CalendarService.calendarpostread();
     }
 
 

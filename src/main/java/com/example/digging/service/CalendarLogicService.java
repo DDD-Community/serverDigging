@@ -5,6 +5,7 @@ import com.example.digging.domain.network.CalendarHeader;
 import com.example.digging.domain.network.response.CalendarResponse;
 import com.example.digging.domain.network.response.RecentDiggingResponse;
 import com.example.digging.domain.repository.*;
+import com.example.digging.util.SecurityUtil;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -42,9 +43,12 @@ public class CalendarLogicService {
 
 
     @SneakyThrows
-    public CalendarHeader<ArrayList<CalendarResponse>> calendarread(Integer userid, String yearmonth){
+    public CalendarHeader<ArrayList<CalendarResponse>> calendarread(String yearmonth){
 
-        Optional<User> optional = userRepository.findById(userid);
+        User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUsername)
+                .orElseThrow(() -> new RuntimeException("token 오류 입니다. 사용자를 찾을 수 없습니다."));
+
+        Optional<User> optional = userRepository.findById(userInfo.getUserId());
         ArrayList<CalendarResponse> calendarList = new ArrayList<CalendarResponse>();
         Calendar cal = Calendar.getInstance();
         String year = yearmonth.substring(0,4);
@@ -124,7 +128,7 @@ public class CalendarLogicService {
             idnum += 1;
         }
 
-        List<UserHasPosts> userHasPostsList = userHasPostsRepository.findAllByUser_UserId(userid);
+        List<UserHasPosts> userHasPostsList = userHasPostsRepository.findAllByUser_UserId(userInfo.getUserId());
         int userHasPostsNum = userHasPostsList.size();
 
 
@@ -162,9 +166,11 @@ public class CalendarLogicService {
     }
 
     @SneakyThrows
-    public CalendarHeader<ArrayList<CalendarResponse>> calendarread(Integer userid){
+    public CalendarHeader<ArrayList<CalendarResponse>> calendarread(){
+        User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUsername)
+                .orElseThrow(() -> new RuntimeException("token 오류 입니다. 사용자를 찾을 수 없습니다."));
 
-        Optional<User> optional = userRepository.findById(userid);
+        Optional<User> optional = userRepository.findById(userInfo.getUserId());
         ArrayList<CalendarResponse> calendarList = new ArrayList<CalendarResponse>();
         Calendar cal = Calendar.getInstance();
 
@@ -262,7 +268,7 @@ public class CalendarLogicService {
             idnum += 1;
         }
 
-        List<UserHasPosts> userHasPostsList = userHasPostsRepository.findAllByUser_UserId(userid);
+        List<UserHasPosts> userHasPostsList = userHasPostsRepository.findAllByUser_UserId(userInfo.getUserId());
         int userHasPostsNum = userHasPostsList.size();
 
         System.out.println(userHasPostsNum);
@@ -299,9 +305,12 @@ public class CalendarLogicService {
 
     }
 
-    public ArrayList<RecentDiggingResponse> calendarpostread(Integer userid, String ymd){
-        Optional<User> optional = userRepository.findById(userid);
-        List<UserHasPosts> userHasPostsList = userHasPostsRepository.findAllByUser_UserId(userid);
+    public ArrayList<RecentDiggingResponse> calendarpostread(String ymd){
+        User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUsername)
+                .orElseThrow(() -> new RuntimeException("token 오류 입니다. 사용자를 찾을 수 없습니다."));
+
+        Optional<User> optional = userRepository.findById(userInfo.getUserId());
+        List<UserHasPosts> userHasPostsList = userHasPostsRepository.findAllByUser_UserId(userInfo.getUserId());
         int userHasPostsNum = userHasPostsList.size();
         ArrayList<Integer> postIdList = new ArrayList<Integer>();
         for(int i =0; i<userHasPostsNum; i++){
@@ -404,9 +413,12 @@ public class CalendarLogicService {
                 });
     }
 
-    public ArrayList<RecentDiggingResponse> calendarpostread(Integer userid){
-        Optional<User> optional = userRepository.findById(userid);
-        List<UserHasPosts> userHasPostsList = userHasPostsRepository.findAllByUser_UserId(userid);
+    public ArrayList<RecentDiggingResponse> calendarpostread(){
+        User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUsername)
+                .orElseThrow(() -> new RuntimeException("token 오류 입니다. 사용자를 찾을 수 없습니다."));
+
+        Optional<User> optional = userRepository.findById(userInfo.getUserId());
+        List<UserHasPosts> userHasPostsList = userHasPostsRepository.findAllByUser_UserId(userInfo.getUserId());
         int userHasPostsNum = userHasPostsList.size();
         ArrayList<Integer> postIdList = new ArrayList<Integer>();
         for(int i =0; i<userHasPostsNum; i++){
