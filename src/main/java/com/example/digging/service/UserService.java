@@ -1,21 +1,24 @@
 package com.example.digging.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import com.example.digging.adapter.jwt.TokenProvider;
-import com.example.digging.domain.entity.Authority;
-import com.example.digging.domain.entity.RefreshToken;
-import com.example.digging.domain.entity.User;
+import com.example.digging.domain.entity.*;
 import com.example.digging.domain.network.TokenDto;
 import com.example.digging.domain.network.exception.DuplicateMemberException;
 import com.example.digging.domain.network.UserDto;
-import com.example.digging.domain.repository.RefreshTokenRepository;
-import com.example.digging.domain.repository.UserRepository;
+import com.example.digging.domain.network.response.GetPostNumByTypeResponse;
+import com.example.digging.domain.network.response.PostsResponse;
+import com.example.digging.domain.network.response.TotalTagResponse;
+import com.example.digging.domain.network.response.UserApiResponse;
+import com.example.digging.domain.repository.*;
 import com.example.digging.util.SecurityUtil;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -32,6 +35,24 @@ public class UserService {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
     private final RefreshTokenRepository refreshTokenRepository;
+
+    @Autowired
+    private TagsRepository tagsRepository;
+
+    @Autowired
+    private PostsRepository postsRepository;
+
+    @Autowired
+    private PostTagRepository postTagRepository;
+
+    @Autowired
+    private PostTextRepository postTextRepository;
+
+    @Autowired
+    private PostLinkRepository postLinkRepository;
+
+    @Autowired
+    private UserHasPostsRepository userHasPostsRepository;
 
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, TokenProvider tokenProvider, AuthenticationManagerBuilder authenticationManagerBuilder, RefreshTokenRepository refreshTokenRepository) {
         this.userRepository = userRepository;
@@ -133,7 +154,6 @@ public class UserService {
         return tokenDto;
     }
 
-
     @Transactional(readOnly = true)
     public UserDto getUserInfoWithAutorities() {
 
@@ -163,6 +183,174 @@ public class UserService {
                 })
                 .orElseThrow();
     }
+
+    public PostsResponse deletePost(Integer postid) {
+        User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUsername)
+                .orElseThrow(() -> new RuntimeException("token 오류 입니다. 사용자를 찾을 수 없습니다."));
+
+        Optional<UserHasPosts> optional = userHasPostsRepository.findByUser_UserIdAndPostsPostId(userInfo.getUserId(), postid);
+
+        return optional
+                .map(opt -> {
+                    Posts posts = opt.getPosts();
+
+                    List<PostTag> postTagList = posts.getPostTagList();
+                    postsRepository.delete(posts);
+                    userHasPostsRepository.delete(opt);
+
+                    for (int i =0; i<postTagList.size(); i++) {
+                        postTagRepository.delete(postTagList.get(i));
+                        if(postTagList.get(i).getTags().getPostTagList().isEmpty()){
+                            tagsRepository.delete(postTagList.get(i).getTags());
+                        }
+
+                    }
+
+
+                    PostsResponse postsResponse = PostsResponse.builder()
+                            .resultCode("Delete Success")
+                            .build();
+                    return postsResponse;
+
+
+                })
+                .orElseGet(
+                        ()->{
+                            PostsResponse erros = PostsResponse.builder()
+                                    .resultCode("Error : 데이터 없음")
+                                    .build();
+                            return erros;
+                        }
+                );
+
+
+    }
+
+    public TotalTagResponse getUserTotalTags() {
+        User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUsername)
+                .orElseThrow(() -> new RuntimeException("token 오류 입니다. 사용자를 찾을 수 없습니다."));
+
+        List<Tags> userTagList = tagsRepository.findAllByUser_UserId(userInfo.getUserId());
+        int userTagNum = userTagList.size();
+        ArrayList<String> tagStr = new ArrayList<String>();
+
+        for (int i =0;i<userTagNum;i++) {
+            tagStr.add(userTagList.get(i).getTags());
+        }
+
+        if (userTagNum>0){
+            TotalTagResponse totalTagResponse = TotalTagResponse.builder()
+                    .resultCode("Success")
+                    .totalNum(userTagNum)
+                    .totalTags(tagStr)
+                    .build();
+            return totalTagResponse;
+        }else{
+            TotalTagResponse totalTagResponse = TotalTagResponse.builder()
+                    .resultCode("데이터 없음")
+                    .build();
+            return totalTagResponse;
+        }
+
+
+    }
+
+    public PostsResponse setLike(Integer postid) {
+        User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUsername)
+                .orElseThrow(() -> new RuntimeException("token 오류 입니다. 사용자를 찾을 수 없습니다."));
+
+        Optional<UserHasPosts> optional = userHasPostsRepository.findByUser_UserIdAndPostsPostId(userInfo.getUserId(), postid);
+
+        return optional
+                .map(opt -> {
+                    Posts posts = opt.getPosts();
+                    posts.setIsLike(!posts.getIsLike())
+                            .setUpdatedAt(LocalDateTime.now())
+                    ;
+                    if(posts.getIsText()==Boolean.TRUE){
+                        PostText postText = postTextRepository.findByPostsPostId(opt.getPosts().getPostId());
+                        postTextRepository.save(postText.setUpdatedAt(LocalDateTime.now()));
+                    }
+
+                    if(posts.getIsLink()==Boolean.TRUE){
+                        PostLink postLink = postLinkRepository.findByPostsPostId(opt.getPosts().getPostId());
+                        postLinkRepository.save(postLink.setUpdatedAt(LocalDateTime.now()));
+                    }
+                    return posts;
+                })
+                .map(posts -> postsRepository.save(posts))
+                .map(updatePost -> postres(updatePost))
+                .orElseGet(
+                        ()->{
+                            PostsResponse errres = PostsResponse.builder()
+                                    .resultCode("데이터 없음")
+                                    .build();
+                            return errres;
+                        }
+                );
+    }
+
+    public GetPostNumByTypeResponse getPostNumByType() {
+
+        User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUsername)
+                .orElseThrow(() -> new RuntimeException("token 오류 입니다. 사용자를 찾을 수 없습니다."));
+
+        List<UserHasPosts> userHasPostsList = userHasPostsRepository.findAllByUser_UserId(userInfo.getUserId());
+        int postsNum = userHasPostsList.size();
+        Integer textNum = 0; Integer imgNum = 0; Integer linkNum = 0;
+        for(int i=0;i<postsNum;i++){
+            if (userHasPostsList.get(i).getPosts().getIsText() == Boolean.TRUE) {textNum += 1;}
+            if (userHasPostsList.get(i).getPosts().getIsImg() == Boolean.TRUE) {imgNum += 1;}
+            if (userHasPostsList.get(i).getPosts().getIsLink() == Boolean.TRUE) {linkNum += 1;}
+        }
+
+        return numres(textNum, imgNum, linkNum, userInfo.getUserId());
+    }
+
+    private GetPostNumByTypeResponse numres(Integer text, Integer img, Integer link, Integer userid) {
+        Optional<User> user = userRepository.findById(userid);
+        String username = user.map(finduser -> finduser.getUsername()).orElseGet(()->"User Error");
+
+        GetPostNumByTypeResponse getPostNumByTypeResponse = GetPostNumByTypeResponse.builder()
+                .resultCode("Success")
+                .userName(username)
+                .totalText(text)
+                .totalImg(img)
+                .totalLink(link)
+                .build();
+
+        return getPostNumByTypeResponse;
+    }
+
+
+    private PostsResponse postres(Posts posts) {
+        PostsResponse postsResponse = PostsResponse.builder()
+                .resultCode("Success")
+                .postId(posts.getPostId())
+                .isText(posts.getIsText())
+                .isImg(posts.getIsImg())
+                .isLink(posts.getIsLink())
+                .isLike(posts.getIsLike())
+                .createdAt(posts.getCreatedAt())
+                .createdBy(posts.getCreatedBy())
+                .updatedAt(posts.getUpdatedAt())
+                .updatedBy(posts.getUpdatedBy())
+                .build();
+        String typeStr = null;
+        if (postsResponse.getIsText() == Boolean.TRUE) {
+            typeStr = "text";
+        }
+        if (postsResponse.getIsImg() == Boolean.TRUE) {
+            typeStr = "img";
+        }
+        if (postsResponse.getIsLink() == Boolean.TRUE) {
+            typeStr = "link";
+        }
+        postsResponse.setType(typeStr);
+        return postsResponse;
+    }
+
+
 
     @Transactional(readOnly = true)
     public Optional<User> getMyUserWithAuthorities() {

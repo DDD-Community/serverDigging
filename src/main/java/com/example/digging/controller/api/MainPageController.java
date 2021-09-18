@@ -21,8 +21,8 @@ public class MainPageController {
     MainPageLogicService mainPageLogicService;
 
     @GetMapping("/recent")
-    public ArrayList<RecentDiggingResponse> recentPostsRead(Integer userid){
-        log.info("[READ] User {} Recent Digging", userid);
-        return mainPageLogicService.recentPostsRead(userid);
+    public ArrayList<RecentDiggingResponse> recentPostsRead(){
+        log.info("[READ] User Recent Digging");
+        return mainPageLogicService.recentPostsRead();
     }
 }

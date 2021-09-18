@@ -5,6 +5,10 @@ import com.example.digging.domain.entity.User;
 import com.example.digging.domain.network.TokenDto;
 import com.example.digging.domain.network.UserDto;
 import com.example.digging.domain.network.response.ErrorResponse;
+import com.example.digging.domain.network.response.GetPostNumByTypeResponse;
+import com.example.digging.domain.network.response.PostsResponse;
+import com.example.digging.domain.network.response.TotalTagResponse;
+import com.example.digging.service.UserApiLogicService;
 import com.example.digging.service.UserService;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
@@ -58,6 +62,30 @@ public class UserController {
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public UserDto getMyUserInfo() {
         return userService.getUserInfoWithAutorities();
+    }
+
+    @GetMapping("/get_total_tags")
+    public TotalTagResponse getUserTotalTags() {
+        log.info("user Total tags ");
+        return userService.getUserTotalTags();
+    }
+
+    @PutMapping("/set_like")
+    public PostsResponse setLike(@RequestParam(name = "postid") Integer postid) {
+        log.info("setLike : {}", postid);
+        return userService.setLike(postid);
+    }
+
+    @GetMapping("/posts_num_bytype")
+    public GetPostNumByTypeResponse getPostNumByType() {
+        log.info("[User] Get Post Num By Type");
+        return userService.getPostNumByType();
+    }
+
+    @DeleteMapping("/delete_post")
+    public PostsResponse deletePost(@RequestParam(name = "postid") Integer postid) {
+        log.info("delete id : {}", postid);
+        return userService.deletePost(postid);
     }
 
 }

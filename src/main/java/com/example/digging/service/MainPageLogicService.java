@@ -6,6 +6,7 @@ import com.example.digging.domain.network.response.PostLinkReadResponse;
 import com.example.digging.domain.network.response.PostTextReadResponse;
 import com.example.digging.domain.network.response.RecentDiggingResponse;
 import com.example.digging.domain.repository.*;
+import com.example.digging.util.SecurityUtil;
 import com.example.digging.util.UrlTypeValidation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,9 +35,12 @@ public class MainPageLogicService {
     @Autowired
     private PostTagRepository postTagRepository;
 
-    public ArrayList<RecentDiggingResponse> recentPostsRead(Integer userid) {
-        Optional<User> optional = userRepository.findById(userid);
-        List<UserHasPosts> userHasPostsList = userHasPostsRepository.findAllByUser_UserId(userid);
+    public ArrayList<RecentDiggingResponse> recentPostsRead() {
+        User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUsername)
+                .orElseThrow(() -> new RuntimeException("token 오류 입니다. 사용자를 찾을 수 없습니다."));
+
+        Optional<User> optional = userRepository.findById(userInfo.getUserId());
+        List<UserHasPosts> userHasPostsList = userHasPostsRepository.findAllByUser_UserId(userInfo.getUserId());
         int userHasPostsNum = userHasPostsList.size();
         ArrayList<Integer> postIdList = new ArrayList<Integer>();
         for(int i =0; i<userHasPostsNum; i++){

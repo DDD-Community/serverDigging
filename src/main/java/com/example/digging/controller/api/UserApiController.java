@@ -53,29 +53,5 @@ public class UserApiController implements CrudInterface<UserApiRequest, UserApiR
         return userApiLogicService.delete(id);
     }
 
-    @GetMapping("/get_total_tags")
-    public TotalTagResponse getUserTotalTags(@RequestParam(name = "userid") Integer id) {
-        log.info("user Total tags : {}", id);
-        return userApiLogicService.getUserTotalTags(id);
-    }
-
-    @PutMapping("/set_like")
-    public PostsResponse setLike(@RequestParam(name = "userid") Integer userid, @RequestParam(name = "postid") Integer postid) {
-        log.info("setLike : {}", postid);
-        return userApiLogicService.setLike(userid, postid);
-    }
-
-    @GetMapping("/posts_num_bytype")
-    public GetPostNumByTypeResponse getPostNumByType(@RequestParam(name = "userid") Integer id) {
-        log.info("[User {} ] Get Post Num By Type", id);
-        return userApiLogicService.getPostNumByType(id);
-    }
-
-    @DeleteMapping("/delete")
-    public PostsResponse deletePost(@RequestParam(name = "userid") Integer userid, @RequestParam(name = "postid") Integer postid) {
-        log.info("delete id : {}", postid);
-        return userApiLogicService.deletePost(userid, postid);
-    }
-
 
 }
