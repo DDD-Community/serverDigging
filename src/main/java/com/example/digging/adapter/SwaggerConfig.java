@@ -28,7 +28,7 @@ public class SwaggerConfig {
                 .groupName(version)
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("com.example.digging.controller"))
-                .paths(PathSelectors.ant("/api/user/**"))
+                .paths(PathSelectors.ant("/api/**"))
                 .build()
                 .apiInfo(apiInfo(title, version));
 

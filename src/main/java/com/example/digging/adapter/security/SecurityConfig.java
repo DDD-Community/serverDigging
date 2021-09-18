@@ -75,8 +75,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/reissue").permitAll()
                 //회원가입(토큰없는상태에서요청들어옴)
                 .antMatchers("/api/signup").permitAll()
-                .antMatchers("/api").permitAll()
-                .antMatchers("/swagger-ui.html").permitAll()
+                .antMatchers("/swagger-ui.html", "/v2/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**").permitAll()
 
                 .anyRequest().authenticated()
 

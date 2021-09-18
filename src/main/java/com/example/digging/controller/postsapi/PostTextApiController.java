@@ -42,15 +42,15 @@ public class PostTextApiController implements CrudInterface<PostTextApiRequest, 
     }
 
     @GetMapping("")
-    public PostTextReadResponse textread(@RequestParam(name = "userid") Integer userid, @RequestParam(name = "postid") Integer postid) {
-        log.info("[READ Text] user {} : post {}", userid, postid);
-        return postTextApiLogicService.textread(userid, postid);
+    public PostTextReadResponse textread( @RequestParam(name = "postid") Integer postid) {
+        log.info("[READ Text] user {} : post {}",  postid);
+        return postTextApiLogicService.textread( postid);
     }
 
     @GetMapping("/all_text_read")
-    public ArrayList<PostTextReadResponse> alltextread(@RequestParam(name = "userid") Integer userid) {
-        log.info("[READ All Text] user {} : post {}", userid);
-        return postTextApiLogicService.alltextread(userid);
+    public ArrayList<PostTextReadResponse> alltextread() {
+        log.info("[READ All Text] user {} : post {}");
+        return postTextApiLogicService.alltextread();
     }
 
     @Override

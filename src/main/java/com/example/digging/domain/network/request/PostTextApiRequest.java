@@ -12,8 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class PostTextApiRequest {
-    private String userName;
-    private Integer userId;
+
     private String title;
     private String content;
     private List<String> tags;

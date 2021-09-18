@@ -2,6 +2,7 @@ package com.example.digging.service;
 
 import com.example.digging.domain.entity.*;
 import com.example.digging.domain.network.Header;
+import com.example.digging.domain.network.exception.DuplicateMemberException;
 import com.example.digging.domain.network.request.PostLinkApiRequest;
 import com.example.digging.domain.network.request.PostTextApiRequest;
 import com.example.digging.domain.network.response.PostLinkApiResponse;
@@ -10,6 +11,7 @@ import com.example.digging.domain.network.response.PostTextApiResponse;
 import com.example.digging.domain.network.response.PostTextReadResponse;
 import com.example.digging.domain.repository.*;
 import com.example.digging.ifs.CrudInterface;
+import com.example.digging.util.SecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -43,6 +45,10 @@ public class PostTextApiLogicService implements CrudInterface<PostTextApiRequest
 
     @Override
     public PostTextApiResponse create(PostTextApiRequest request) {
+
+        User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUsername)
+                .orElseThrow(() -> new RuntimeException("token 오류 입니다. 사용자를 찾을 수 없습니다."));
+
         PostTextApiRequest body = request;
 
         String[] tags = body.getTagsArr();
@@ -54,15 +60,15 @@ public class PostTextApiLogicService implements CrudInterface<PostTextApiRequest
                 .isLink(Boolean.FALSE)
                 .isLike(Boolean.FALSE)
                 .createdAt(LocalDateTime.now())
-                .createdBy(body.getUserName())
+                .createdBy(userInfo.getUsername())
                 .updatedAt(LocalDateTime.now())
-                .updatedBy(body.getUserName())
+                .updatedBy(userInfo.getUsername())
                 .build();
         Posts newPosts = postsRepository.save(posts);
 
         for (int i=0; i<tags.length; i++) {
             String checkTag = tags[i];
-            Tags existTag = tagsRepository.findByTagsAndUser_UserId(checkTag, body.getUserId());
+            Tags existTag = tagsRepository.findByTagsAndUser_UserId(checkTag, userInfo.getUserId());
             if (existTag != null){
                 PostTag postTag = PostTag.builder()
                         .posts(newPosts)
@@ -73,7 +79,7 @@ public class PostTextApiLogicService implements CrudInterface<PostTextApiRequest
 
                 Tags newTags = Tags.builder()
                         .tags(tags[i])
-                        .user(userRepository.getOne(body.getUserId()))
+                        .user(userRepository.getOne(userInfo.getUserId()))
                         .build();
                 Tags newTag = tagsRepository.save(newTags);
                 newTagList.add(tags[i]);
@@ -87,7 +93,7 @@ public class PostTextApiLogicService implements CrudInterface<PostTextApiRequest
         }
 
         UserHasPosts userHasPosts = UserHasPosts.builder()
-                .user(userRepository.getOne(body.getUserId()))
+                .user(userRepository.getOne(userInfo.getUserId()))
                 .posts(newPosts)
                 .build();
         userHasPostsRepository.save(userHasPosts);
@@ -97,9 +103,9 @@ public class PostTextApiLogicService implements CrudInterface<PostTextApiRequest
                 .title(body.getTitle())
                 .content(body.getContent())
                 .createdAt(LocalDateTime.now())
-                .createdBy(body.getUserName())
+                .createdBy(userInfo.getUsername())
                 .updatedAt(LocalDateTime.now())
-                .updatedBy(body.getUserName())
+                .updatedBy(userInfo.getUsername())
                 .build();
 
         PostText newPostText = postTextRepository.save(postText);
@@ -123,8 +129,12 @@ public class PostTextApiLogicService implements CrudInterface<PostTextApiRequest
         return null;
     }
 
-    public PostTextReadResponse textread(Integer userid, Integer postid) {
-        Optional<UserHasPosts> optional = userHasPostsRepository.findByUser_UserIdAndPostsPostId(userid, postid);
+    public PostTextReadResponse textread(Integer postid) {
+
+        User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUsername)
+                .orElseThrow(() -> new RuntimeException("token 오류 입니다. 사용자를 찾을 수 없습니다."));
+
+        Optional<UserHasPosts> optional = userHasPostsRepository.findByUser_UserIdAndPostsPostId(userInfo.getUserId(), postid);
         ArrayList<String> tagList = new ArrayList<String>();
 
         return optional
@@ -153,9 +163,12 @@ public class PostTextApiLogicService implements CrudInterface<PostTextApiRequest
 
     }
 
-    public ArrayList<PostTextReadResponse> alltextread(Integer userid) {
-        Optional<User> optional = userRepository.findById(userid);
-        List<UserHasPosts> userHasPosts = userHasPostsRepository.findAllByUser_UserId(userid);
+    public ArrayList<PostTextReadResponse> alltextread() {
+        User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUsername)
+                .orElseThrow(() -> new RuntimeException("token 오류 입니다. 사용자를 찾을 수 없습니다."));
+
+        Optional<User> optional = userRepository.findById(userInfo.getUserId());
+        List<UserHasPosts> userHasPosts = userHasPostsRepository.findAllByUser_UserId(userInfo.getUserId());
         int userHasPostsNum = userHasPosts.size();
 
         ArrayList<PostText> postTexts = new ArrayList<PostText>();
