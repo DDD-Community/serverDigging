@@ -38,15 +38,15 @@ public class PostLinkApiController implements CrudInterface<PostLinkApiRequest, 
     }
 
     @GetMapping("")
-    public PostLinkReadResponse linkread(@RequestParam(name = "userid") Integer userid, @RequestParam(name = "postid") Integer postid) {
-        log.info("[READ LINK] user {} : post {}", userid, postid);
-        return postLinkApiLogicService.linkread(userid, postid);
+    public PostLinkReadResponse linkread(@RequestParam(name = "postid") Integer postid) {
+        log.info("[READ LINK] : post {}", postid);
+        return postLinkApiLogicService.linkread(postid);
     }
 
     @GetMapping("/all_link_read")
-    public ArrayList<PostLinkReadResponse> alllinkread(@RequestParam(name = "userid") Integer userid) {
-        log.info("[READ All Link] user {} : post {}", userid);
-        return postLinkApiLogicService.alllinkread(userid);
+    public ArrayList<PostLinkReadResponse> alllinkread() {
+        log.info("[READ All Link]" );
+        return postLinkApiLogicService.alllinkread();
     }
 
     @Override

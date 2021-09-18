@@ -8,6 +8,7 @@ import com.example.digging.domain.network.response.PostLinkReadResponse;
 import com.example.digging.domain.network.response.PostTextReadResponse;
 import com.example.digging.domain.repository.*;
 import com.example.digging.ifs.CrudInterface;
+import com.example.digging.util.SecurityUtil;
 import com.example.digging.util.UrlTypeValidation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.support.NullValue;
@@ -47,6 +48,10 @@ public class PostLinkApiLogicService implements CrudInterface<PostLinkApiRequest
     @Override
     public PostLinkApiResponse create(PostLinkApiRequest request) {
         PostLinkApiRequest body = request;
+
+        User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUsername)
+                .orElseThrow(() -> new RuntimeException("token 오류 입니다. 사용자를 찾을 수 없습니다."));
+
         String linkStirng = body.getUrl();
 
         String[] tags = body.getTagsArr();
@@ -61,15 +66,15 @@ public class PostLinkApiLogicService implements CrudInterface<PostLinkApiRequest
                     .isLink(Boolean.TRUE)
                     .isLike(Boolean.FALSE)
                     .createdAt(LocalDateTime.now())
-                    .createdBy(body.getUserName())
+                    .createdBy(userInfo.getUsername())
                     .updatedAt(LocalDateTime.now())
-                    .updatedBy(body.getUserName())
+                    .updatedBy(userInfo.getUsername())
                     .build();
             Posts newPosts = postsRepository.save(posts);
 
             for (int i=0; i<tags.length; i++) {
                 String checkTag = tags[i];
-                Tags existTag = tagsRepository.findByTagsAndUser_UserId(checkTag, body.getUserId());
+                Tags existTag = tagsRepository.findByTagsAndUser_UserId(checkTag, userInfo.getUserId());
                 if (existTag != null){
                     PostTag postTag = PostTag.builder()
                             .posts(newPosts)
@@ -80,7 +85,7 @@ public class PostLinkApiLogicService implements CrudInterface<PostLinkApiRequest
 
                     Tags newTags = Tags.builder()
                             .tags(tags[i])
-                            .user(userRepository.getOne(body.getUserId()))
+                            .user(userRepository.getOne(userInfo.getUserId()))
                             .build();
                     Tags newTag = tagsRepository.save(newTags);
                     newTagList.add(tags[i]);
@@ -94,7 +99,7 @@ public class PostLinkApiLogicService implements CrudInterface<PostLinkApiRequest
             }
 
             UserHasPosts userHasPosts = UserHasPosts.builder()
-                    .user(userRepository.getOne(body.getUserId()))
+                    .user(userRepository.getOne(userInfo.getUserId()))
                     .posts(newPosts)
                     .build();
             userHasPostsRepository.save(userHasPosts);
@@ -104,9 +109,9 @@ public class PostLinkApiLogicService implements CrudInterface<PostLinkApiRequest
                     .title(body.getTitle())
                     .url(body.getUrl())
                     .createdAt(LocalDateTime.now())
-                    .createdBy(body.getUserName())
+                    .createdBy(userInfo.getUsername())
                     .updatedAt(LocalDateTime.now())
-                    .updatedBy(body.getUserName())
+                    .updatedBy(userInfo.getUsername())
                     .build();
             PostLink newPostLink = postLinkRepository.save(postLink);
 
@@ -124,8 +129,11 @@ public class PostLinkApiLogicService implements CrudInterface<PostLinkApiRequest
         return null;
     }
 
-    public PostLinkReadResponse linkread(Integer userid, Integer postid) {
-        Optional<UserHasPosts> optional = userHasPostsRepository.findByUser_UserIdAndPostsPostId(userid, postid);
+    public PostLinkReadResponse linkread(Integer postid) {
+        User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUsername)
+                .orElseThrow(() -> new RuntimeException("token 오류 입니다. 사용자를 찾을 수 없습니다."));
+
+        Optional<UserHasPosts> optional = userHasPostsRepository.findByUser_UserIdAndPostsPostId(userInfo.getUserId(), postid);
         ArrayList<String> tagList = new ArrayList<String>();
 
         return optional
@@ -185,9 +193,11 @@ public class PostLinkApiLogicService implements CrudInterface<PostLinkApiRequest
         return postLinkReadResponse;
     }
 
-    public ArrayList<PostLinkReadResponse> alllinkread(Integer userid) {
-        Optional<User> optional = userRepository.findById(userid);
-        List<UserHasPosts> userHasPosts = userHasPostsRepository.findAllByUser_UserId(userid);
+    public ArrayList<PostLinkReadResponse> alllinkread() {
+        User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUsername)
+                .orElseThrow(() -> new RuntimeException("token 오류 입니다. 사용자를 찾을 수 없습니다."));
+        Optional<User> optional = userRepository.findById(userInfo.getUserId());
+        List<UserHasPosts> userHasPosts = userHasPostsRepository.findAllByUser_UserId(userInfo.getUserId());
         int userHasPostsNum = userHasPosts.size();
 
         ArrayList<PostLink> postLinks = new ArrayList<PostLink>();

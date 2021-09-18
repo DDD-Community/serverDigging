@@ -12,8 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class PostLinkApiRequest {
-    private String userName;
-    private Integer userId;
+
     private String title;
     private String url;
     private List<String> tags;
