@@ -1,8 +1,6 @@
 package com.example.digging.service;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -10,24 +8,17 @@ import java.util.Optional;
 import com.example.digging.adapter.jwt.TokenProvider;
 import com.example.digging.domain.entity.Authority;
 import com.example.digging.domain.entity.RefreshToken;
-import com.example.digging.domain.entity.Tags;
 import com.example.digging.domain.entity.User;
-import com.example.digging.domain.network.LoginDto;
 import com.example.digging.domain.network.TokenDto;
 import com.example.digging.domain.network.exception.DuplicateMemberException;
 import com.example.digging.domain.network.UserDto;
-import com.example.digging.domain.network.response.UserApiResponse;
 import com.example.digging.domain.repository.RefreshTokenRepository;
 import com.example.digging.domain.repository.UserRepository;
 import com.example.digging.util.SecurityUtil;
 
-import org.hibernate.Session;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -86,10 +77,10 @@ public class UserService {
     }
 
     @Transactional
-    public TokenDto login(LoginDto loginDto) {
+    public TokenDto login(String username) {
         // 1. Login ID/PW 를 기반으로 AuthenticationToken 생성
         UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword());
+                new UsernamePasswordAuthenticationToken(username, username);
 
         // 2. 실제로 검증 (사용자 비밀번호 체크) 이 이루어지는 부분
         //    authenticate 메서드가 실행이 될 때 CustomUserDetailsService 에서 만들었던 loadUserByUsername 메서드가 실행됨
@@ -150,6 +141,8 @@ public class UserService {
 
         RefreshToken refreshToken = refreshTokenRepository.findById(userInfo.get().getUsername())
                 .orElseThrow(() -> new RuntimeException("로그아웃 된 사용자입니다."));
+
+
 
         return userInfo
                 .map(user -> {
