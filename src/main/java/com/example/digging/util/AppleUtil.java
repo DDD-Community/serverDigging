@@ -92,8 +92,8 @@ public class AppleUtil {
             return tokenResponse.getSub();
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
+            return decodedString;
         }
-        return decodedString;
 
     }
 }

@@ -51,8 +51,8 @@ public class UserService {
     }
 
     @Transactional
-    public User signup(UserDto userDto) {
-        if (userRepository.findOneWithAuthoritiesByOauthId(userDto.getOauthId()).orElse(null) != null) {
+    public User signup(String oauthId, String username, String email, String provider) {
+        if (userRepository.findOneWithAuthoritiesByOauthId(oauthId).orElse(null) != null) {
             throw new DuplicateMemberException("이미 가입되어 있는 유저입니다.");
         }
 
@@ -62,23 +62,22 @@ public class UserService {
                 .build();
 
         String makeNewUsername;
-        List<User> sameUsernameList = userRepository.findByUsernameStartsWith(userDto.getUsername());
+        List<User> sameUsernameList = userRepository.findByUsernameStartsWith(username);
         int sameUsernameNum = sameUsernameList.size();
         if (sameUsernameNum > 0 ) {
-            makeNewUsername = userDto.getUsername() +  Integer.toString(sameUsernameNum + 1);
+            makeNewUsername = username +  Integer.toString(sameUsernameNum + 1);
         } else {
-            makeNewUsername = userDto.getUsername();
+            makeNewUsername = username;
         }
 
         User user = User.builder()
                 .username(makeNewUsername)
-                .password(passwordEncoder.encode(userDto.getPassword()))
-                .email(userDto.getEmail())
-                .provider(userDto.getProvider())
-                .interest(userDto.getInterest())
+                .password(passwordEncoder.encode(username))
+                .email(email)
+                .provider(provider)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
-                .oauthId(userDto.getOauthId())
+                .oauthId(oauthId)
                 .authorities(Collections.singleton(authority))
                 .activated(true)
                 .build();

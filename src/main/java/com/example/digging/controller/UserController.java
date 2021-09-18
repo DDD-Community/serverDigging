@@ -5,9 +5,11 @@ import com.example.digging.domain.entity.User;
 import com.example.digging.domain.network.LoginDto;
 import com.example.digging.domain.network.TokenDto;
 import com.example.digging.domain.network.UserDto;
+import com.example.digging.domain.network.response.ErrorResponse;
 import com.example.digging.service.UserService;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -36,11 +38,18 @@ public class UserController {
         return appleImpl.getAppleSUBIdentity(idToken);
     }
 
-    @PostMapping("/signup")
+    @PostMapping(value = "/signup", params = { "id_token", "username", "email", "provider" })
     public ResponseEntity<User> signup(
-            @Valid @RequestBody UserDto userDto
+            @Valid @RequestParam(name = "id_token") String idToken, @RequestParam(name = "username") String username,
+            @RequestParam(name = "email") String email, @RequestParam(name = "provider") String provider
     ) {
-        return ResponseEntity.ok(userService.signup(userDto));
+        String oauthId = appleImpl.getAppleSUBIdentity(idToken);
+        if (oauthId == "not valid id_token") {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ErrorResponse("id_token 오류 입니다. id_token 값이 유효하지 않습니다"));
+
+        }
+        return ResponseEntity.ok(userService.signup(oauthId, username, email, provider));
     }
 
     @PostMapping("/login")
