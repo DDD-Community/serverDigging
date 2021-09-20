@@ -3,17 +3,16 @@ package com.example.digging.controller.postsapi;
 import com.example.digging.domain.network.request.PostImgApiRequest;
 import com.example.digging.domain.network.request.PostLinkApiRequest;
 import com.example.digging.domain.network.response.PostImgApiResponse;
+import com.example.digging.domain.network.response.PostImgReadResponse;
 import com.example.digging.domain.network.response.PostLinkApiResponse;
+import com.example.digging.domain.network.response.PostTextReadResponse;
 import com.example.digging.ifs.CrudInterface;
 import com.example.digging.service.PostImgApiLogicService;
 import com.example.digging.service.S3UploaderService;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -72,6 +71,12 @@ public class PostImgApiController implements CrudInterface<PostImgApiRequest, Po
     @Override
     public PostImgApiResponse read(Integer id) {
         return null;
+    }
+
+    @GetMapping("")
+    public PostImgReadResponse imgread(@RequestParam(name = "postid") Integer postid) {
+        log.info("[READ Img] : post {}",  postid);
+        return postImgApiLogicService.imgread(postid);
     }
 
     @Override

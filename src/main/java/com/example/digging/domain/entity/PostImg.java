@@ -4,6 +4,7 @@ import lombok.*;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -15,7 +16,7 @@ import java.util.List;
 @Builder
 @Accessors(chain = true)
 @ToString(exclude = {"imgsList", "posts"})
-public class PostImg {
+public class PostImg implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,7 +34,6 @@ public class PostImg {
     private List<Imgs> imgsList;
 
     @ManyToOne
-//    @JoinColumn(name = "post_id")
     private Posts posts;
 
 }

@@ -4,6 +4,7 @@ import lombok.*;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Data
 @AllArgsConstructor
@@ -22,10 +23,6 @@ public class Imgs {
     private String imgUrl;
 
     @ManyToOne
-//    @JoinColumns({
-//            @JoinColumn(name="post_id", referencedColumnName="posts_post_id"),
-//            @JoinColumn(name="img_id", referencedColumnName="img_id")
-//    })
     @JoinColumn(name = "post_id", referencedColumnName = "posts_post_id")
     @JoinColumn(name = "img_id", referencedColumnName = "img_id")
     private PostImg postImg;
