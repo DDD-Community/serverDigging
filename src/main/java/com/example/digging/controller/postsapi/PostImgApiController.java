@@ -5,6 +5,7 @@ import com.example.digging.domain.network.request.PostLinkApiRequest;
 import com.example.digging.domain.network.response.PostImgApiResponse;
 import com.example.digging.domain.network.response.PostLinkApiResponse;
 import com.example.digging.ifs.CrudInterface;
+import com.example.digging.service.PostImgApiLogicService;
 import com.example.digging.service.S3UploaderService;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -26,9 +28,12 @@ import java.util.ArrayList;
 public class PostImgApiController implements CrudInterface<PostImgApiRequest, PostImgApiResponse> {
 
     private final S3UploaderService s3UploaderService;
+    private final PostImgApiLogicService postImgApiLogicService;
 
     @PostMapping("")
-    public ArrayList<String> upload(
+    public PostImgApiResponse upload(
+            @RequestParam(value="title") String title,
+            @RequestParam(value="tags", required=false) List<String> tags,
             @RequestParam(name = "image1") MultipartFile multipartFile1,
             @RequestParam(name = "image2", required = false) MultipartFile multipartFile2,
             @RequestParam(name = "image3", required = false) MultipartFile multipartFile3,
@@ -56,7 +61,7 @@ public class PostImgApiController implements CrudInterface<PostImgApiRequest, Po
             imgUrls.add(result5);
         }
 
-        return imgUrls;
+        return postImgApiLogicService.create(title, tags, imgUrls);
     }
 
     @Override

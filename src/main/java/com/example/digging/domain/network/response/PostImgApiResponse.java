@@ -17,9 +17,9 @@ public class PostImgApiResponse {
     private String type;
     private String userName;
     private Integer postId;
-    private Integer postImgId;
+    private Integer imgId;
     private String title;
     private ArrayList<String> newTags;
-    private ArrayList<Integer> images;
+    private ArrayList<ImgsApiResponse> imgs;
 
 }

@@ -19,12 +19,14 @@ public class PostImg {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "img_id")
     private Integer imgId;
 
     private String title;
     private LocalDateTime createdAt;
     private String createdBy;
     private LocalDateTime updatedAt;
+    private String updatedBy;
 
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "postImg", cascade = CascadeType.ALL)
