@@ -16,7 +16,8 @@ public class DiggingApplication {
 
 
     public static void main(String[] args) {
-        SpringApplication.run(DiggingApplication.class, args);
+        SpringApplication
+                .run(DiggingApplication.class, args);
     }
 
 }
