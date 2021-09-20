@@ -176,6 +176,39 @@ public class PostImgApiLogicService implements CrudInterface<PostImgApiRequest, 
 
     }
 
+    public ArrayList<PostImgReadResponse> allimgread() {
+        User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUsername)
+                .orElseThrow(() -> new RuntimeException("token 오류 입니다. 사용자를 찾을 수 없습니다."));
+
+        Optional<User> optional = userRepository.findById(userInfo.getUserId());
+        List<UserHasPosts> userHasPosts = userHasPostsRepository.findAllByUser_UserId(userInfo.getUserId());
+        int userHasPostsNum = userHasPosts.size();
+
+        ArrayList<PostImg> postImgs = new ArrayList<PostImg>();
+        ArrayList<ArrayList> tags = new ArrayList();
+        for(int i =0; i<userHasPostsNum; i++){
+            if(userHasPosts.get(i).getPosts().getIsImg() == Boolean.TRUE) {
+                postImgs.add(postImgRepository.findByPostsPostId(userHasPosts.get(i).getPosts().getPostId()));
+                List<PostTag> nowTags = postTagRepository.findAllByPostsPostId(userHasPosts.get(i).getPosts().getPostId());
+                int nowTagsSize = nowTags.size();
+                ArrayList<String> tagStr = new ArrayList<String>();
+                for(int j=0;j<nowTagsSize;j++){
+                    tagStr.add(nowTags.get(j).getTags().getTags());
+                }
+                tags.add(tagStr);
+            }
+        }
+
+
+        return optional.map(user -> allreadres(postImgs, tags)).orElseGet(()->{
+            ArrayList<PostImgReadResponse> errorList = new ArrayList<PostImgReadResponse>();
+            PostImgReadResponse error = PostImgReadResponse.builder().resultCode("Error").build();
+            errorList.add(error);
+            return errorList;
+        });
+
+    }
+
     @Override
     public PostImgApiResponse update(Integer id, PostImgApiRequest request) {
         return null;
@@ -220,4 +253,50 @@ public class PostImgApiLogicService implements CrudInterface<PostImgApiRequest, 
                 .build();
         return postImgReadResponse;
     }
+
+    private ArrayList<PostImgReadResponse> allreadres(ArrayList<PostImg> postImg, ArrayList<ArrayList> tags){
+
+        int postImgNum = postImg.size();
+        ArrayList<PostImgReadResponse> postImgReadResponsesList = new ArrayList<PostImgReadResponse>();
+
+        for(int i=0; i<postImgNum;i++){
+            ArrayList<ImgsApiResponse> imgsResponse = new ArrayList<>();
+            System.out.println(postImgNum);
+            List<Imgs> images = imgsRepository.findAllByPostImg_PostsPostId(postImg.get(i).getPosts().getPostId());
+            int imgsNum = images.size();
+            System.out.println(imgsNum);
+            for(int j=0; j<imgsNum; j++) {
+                ImgsApiResponse imgsApiResponse = ImgsApiResponse.builder()
+                        .id(images.get(j).getId())
+                        .imgUrl(images.get(j).getImgUrl())
+                        .build();
+                imgsResponse.add(imgsApiResponse);
+            }
+
+            PostImgReadResponse postImgReadResponse = PostImgReadResponse.builder()
+                    .resultCode("Success")
+                    .type("img")
+                    .postId(postImg.get(i).getPosts().getPostId())
+                    .imgId(postImg.get(i).getImgId())
+                    .title(postImg.get(i).getTitle())
+                    .createdAt(postImg.get(i).getPosts().getCreatedAt())
+                    .createdBy(postImg.get(i).getCreatedBy())
+                    .updatedAt(postImg.get(i).getPosts().getUpdatedAt())
+                    .updatedBy(postImg.get(i).getUpdatedBy())
+                    .isLike(postImg.get(i).getPosts().getIsLike())
+                    .tags(tags.get(i))
+                    .imgs(imgsResponse)
+                    .build();
+
+            postImgReadResponsesList.add(postImgReadResponse);
+        }
+
+        ArrayList<PostImgReadResponse> responsesList = new ArrayList<PostImgReadResponse>();
+        for(int i=0;i<postImgNum;i++) {
+            responsesList.add(postImgReadResponsesList.get(postImgNum-i-1));
+        }
+
+        return responsesList;
+    }
+
 }

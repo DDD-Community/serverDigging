@@ -79,6 +79,12 @@ public class PostImgApiController implements CrudInterface<PostImgApiRequest, Po
         return postImgApiLogicService.imgread(postid);
     }
 
+    @GetMapping("/all_img_read")
+    public ArrayList<PostImgReadResponse> alltextread() {
+        log.info("[READ All Img] : post {}");
+        return postImgApiLogicService.allimgread();
+    }
+
     @Override
     public PostImgApiResponse update(Integer id, PostImgApiRequest request) {
         return null;
