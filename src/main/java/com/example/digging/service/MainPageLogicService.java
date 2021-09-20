@@ -153,6 +153,7 @@ public class MainPageLogicService {
                         .updatedBy(newimg.getUpdatedBy())
                         .isLike(newimg.getPosts().getIsLike())
                         .tags(tagStr)
+                        .totalImgNum(imgsResponse.size())
                         .imgs(imgsResponse)
                         .build();
                 recentDiggingList.add(makingResponse);

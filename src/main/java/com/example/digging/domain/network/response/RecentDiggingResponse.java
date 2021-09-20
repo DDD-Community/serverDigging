@@ -30,4 +30,5 @@ public class RecentDiggingResponse {
     private String updatedBy;
     private ArrayList<String> tags;
     private ArrayList<ImgsApiResponse> imgs;
+    private Integer totalImgNum;
 }

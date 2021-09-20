@@ -23,6 +23,7 @@ public class PostImgReadResponse {
     private LocalDateTime updatedAt;
     private String updatedBy;
     private Boolean isLike;
+    private Integer totalImgNum;
     private ArrayList<String> tags;
     private ArrayList<ImgsApiResponse> imgs;
 }

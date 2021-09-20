@@ -19,6 +19,7 @@ public class PostImgApiResponse {
     private Integer postId;
     private Integer imgId;
     private String title;
+    private Integer totalImgNum;
     private ArrayList<String> newTags;
     private ArrayList<ImgsApiResponse> imgs;
 

@@ -439,6 +439,7 @@ public class CalendarLogicService {
                         .updatedBy(newimg.getUpdatedBy())
                         .isLike(newimg.getPosts().getIsLike())
                         .tags(tagStr)
+                        .totalImgNum(imgsResponse.size())
                         .imgs(imgsResponse)
                         .build();
                 recentDiggingList.add(makingResponse);
@@ -554,6 +555,44 @@ public class CalendarLogicService {
                         .updatedBy(newtext.getUpdatedBy())
                         .isLike(newtext.getPosts().getIsLike())
                         .tags(tagStr)
+                        .build();
+                recentDiggingList.add(makingResponse);
+            }
+
+            if(orderPostsList.get(i).get().getIsImg() == Boolean.TRUE) {
+                PostImg newimg = postImgRepository.findByPostsPostId(orderPostsList.get(i).get().getPostId());
+                List<PostTag> nowTags = postTagRepository.findAllByPostsPostId(orderPostsList.get(i).get().getPostId());
+                int nowTagsSize = nowTags.size();
+                ArrayList<String> tagStr = new ArrayList<String>();
+                for(int j=0;j<nowTagsSize;j++){
+                    tagStr.add(nowTags.get(j).getTags().getTags());
+                }
+
+                ArrayList<ImgsApiResponse> imgsResponse = new ArrayList<>();
+                List<Imgs> images = imgsRepository.findAllByPostImg_PostsPostId(newimg.getPosts().getPostId());
+                int imgsNum = images.size();
+                for(int j=0; j<imgsNum; j++) {
+                    ImgsApiResponse imgsApiResponse = ImgsApiResponse.builder()
+                            .id(images.get(j).getId())
+                            .imgUrl(images.get(j).getImgUrl())
+                            .build();
+                    imgsResponse.add(imgsApiResponse);
+                }
+
+                RecentDiggingResponse makingResponse = RecentDiggingResponse.builder()
+                        .resultCode("Success")
+                        .type("img")
+                        .postId(newimg.getPosts().getPostId())
+                        .imgId(newimg.getImgId())
+                        .title(newimg.getTitle())
+                        .createdAt(newimg.getCreatedAt())
+                        .createdBy(newimg.getCreatedBy())
+                        .updatedAt(newimg.getPosts().getUpdatedAt())
+                        .updatedBy(newimg.getUpdatedBy())
+                        .isLike(newimg.getPosts().getIsLike())
+                        .tags(tagStr)
+                        .totalImgNum(imgsResponse.size())
+                        .imgs(imgsResponse)
                         .build();
                 recentDiggingList.add(makingResponse);
             }

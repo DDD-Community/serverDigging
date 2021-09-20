@@ -229,6 +229,7 @@ public class PostImgApiLogicService implements CrudInterface<PostImgApiRequest, 
                 .imgId(postImg.getImgId())
                 .title(postImg.getTitle())
                 .newTags(tags)
+                .totalImgNum(imgsResponse.size())
                 .imgs(imgsResponse)
                 .build();
 
@@ -249,6 +250,7 @@ public class PostImgApiLogicService implements CrudInterface<PostImgApiRequest, 
                 .updatedBy(postImg.getUpdatedBy())
                 .isLike(postImg.getPosts().getIsLike())
                 .tags(tags)
+                .totalImgNum(imgsResponse.size())
                 .imgs(imgsResponse)
                 .build();
         return postImgReadResponse;
@@ -284,6 +286,7 @@ public class PostImgApiLogicService implements CrudInterface<PostImgApiRequest, 
                     .updatedAt(postImg.get(i).getPosts().getUpdatedAt())
                     .updatedBy(postImg.get(i).getUpdatedBy())
                     .isLike(postImg.get(i).getPosts().getIsLike())
+                    .totalImgNum(imgsResponse.size())
                     .tags(tags.get(i))
                     .imgs(imgsResponse)
                     .build();
