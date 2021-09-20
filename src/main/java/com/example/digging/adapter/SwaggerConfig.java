@@ -114,6 +114,22 @@ public class SwaggerConfig {
 
     }
 
+    @Bean
+    public Docket apiV7() {
+        version = "Search";
+        title = "Search API " + version;
+
+        return new Docket(DocumentationType.SWAGGER_2)
+                .useDefaultResponseMessages(false)
+                .groupName(version)
+                .select()
+                .apis(RequestHandlerSelectors.basePackage("com.example.digging.controller"))
+                .paths(PathSelectors.ant("/search/**"))
+                .build()
+                .apiInfo(apiInfo(title, version));
+
+    }
+
     private ApiInfo apiInfo(String title, String version) {
         return new ApiInfo(
                 title,
