@@ -19,6 +19,7 @@ public class RecentDiggingResponse {
     private Integer postId;
     private Integer linkId;
     private Integer textId;
+    private Integer imgId;
     private String title;
     private String url;
     private String content;
@@ -28,4 +29,5 @@ public class RecentDiggingResponse {
     private Boolean isLike;
     private String updatedBy;
     private ArrayList<String> tags;
+    private ArrayList<ImgsApiResponse> imgs;
 }

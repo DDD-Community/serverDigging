@@ -49,6 +49,9 @@ public class UserService {
     private PostTextRepository postTextRepository;
 
     @Autowired
+    private PostImgRepository postImgRepository;
+
+    @Autowired
     private PostLinkRepository postLinkRepository;
 
     @Autowired
@@ -275,6 +278,11 @@ public class UserService {
                     if(posts.getIsLink()==Boolean.TRUE){
                         PostLink postLink = postLinkRepository.findByPostsPostId(opt.getPosts().getPostId());
                         postLinkRepository.save(postLink.setUpdatedAt(LocalDateTime.now()));
+                    }
+
+                    if(posts.getIsImg()==Boolean.TRUE){
+                        PostImg postImg = postImgRepository.findByPostsPostId(opt.getPosts().getPostId());
+                        postImgRepository.save(postImg.setUpdatedAt(LocalDateTime.now()));
                     }
                     return posts;
                 })
