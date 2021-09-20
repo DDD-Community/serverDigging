@@ -68,6 +68,22 @@ public class SwaggerConfig {
 
     @Bean
     public Docket apiV4() {
+        version = "PostImg";
+        title = "PostImg API " + version;
+
+        return new Docket(DocumentationType.SWAGGER_2)
+                .useDefaultResponseMessages(false)
+                .groupName(version)
+                .select()
+                .apis(RequestHandlerSelectors.basePackage("com.example.digging.controller"))
+                .paths(PathSelectors.ant("/postimg/**"))
+                .build()
+                .apiInfo(apiInfo(title, version));
+
+    }
+
+    @Bean
+    public Docket apiV5() {
         version = "Recent";
         title = "Recent API " + version;
 
@@ -83,7 +99,7 @@ public class SwaggerConfig {
     }
 
     @Bean
-    public Docket apiV5() {
+    public Docket apiV6() {
         version = "Calendar";
         title = "Calendar API " + version;
 
