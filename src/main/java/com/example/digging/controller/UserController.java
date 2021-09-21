@@ -4,6 +4,9 @@ import com.example.digging.adapter.apple.AppleServiceImpl;
 import com.example.digging.domain.entity.User;
 import com.example.digging.domain.network.TokenDto;
 import com.example.digging.domain.network.UserDto;
+import com.example.digging.domain.network.request.LoginRequest;
+import com.example.digging.domain.network.request.PostLinkApiRequest;
+import com.example.digging.domain.network.request.SignupRequest;
 import com.example.digging.domain.network.response.ErrorResponse;
 import com.example.digging.domain.network.response.GetPostNumByTypeResponse;
 import com.example.digging.domain.network.response.PostsResponse;
@@ -35,23 +38,22 @@ public class UserController {
     }
 
 
-    @PostMapping(value = "/signup", params = { "id_token", "username", "email", "provider" })
+    @PostMapping(value = "/signup")
     public ResponseEntity<User> signup(
-            @Valid @RequestParam(name = "id_token") String idToken, @RequestParam(name = "username") String username,
-            @RequestParam(name = "email") String email, @RequestParam(name = "provider") String provider
+            @Valid @RequestBody SignupRequest request
     ) {
-        String oauthId = appleImpl.getAppleSUBIdentity(idToken);
+        String oauthId = appleImpl.getAppleSUBIdentity(request.getIdToken());
         if (oauthId == "not valid id_token") {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ErrorResponse("id_token 오류 입니다. id_token 값이 유효하지 않습니다"));
 
         }
-        return ResponseEntity.ok(userService.signup(oauthId, username, email, provider));
+        return ResponseEntity.ok(userService.signup(oauthId, request.getUsername(), request.getEmail(), request.getProvider()));
     }
 
-    @GetMapping(value = "/login", params = { "username" })
-    public ResponseEntity<TokenDto> login(@RequestParam(name = "username") String username) {
-        return ResponseEntity.ok(userService.login(username));
+    @PostMapping(value = "/login")
+    public ResponseEntity<TokenDto> login(@RequestBody LoginRequest request) {
+        return ResponseEntity.ok(userService.login(request));
     }
 
     @GetMapping(value = "/reissue", params = { "access_token", "refresh_token" })
