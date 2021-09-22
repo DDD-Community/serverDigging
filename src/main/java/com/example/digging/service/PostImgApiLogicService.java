@@ -45,7 +45,7 @@ public class PostImgApiLogicService implements CrudInterface<PostImgApiRequest, 
 
     public PostImgApiResponse create(String title, List<String> tagsList, ArrayList<String> imageUrls){
 
-        User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUsername)
+        User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUid)
                 .orElseThrow(() -> new RuntimeException("token 오류 입니다. 사용자를 찾을 수 없습니다."));
 
         List<String> tags = tagsList;
@@ -132,7 +132,7 @@ public class PostImgApiLogicService implements CrudInterface<PostImgApiRequest, 
     }
 
     public PostImgReadResponse imgread(Integer postid) {
-        User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUsername)
+        User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUid)
                 .orElseThrow(() -> new RuntimeException("token 오류 입니다. 사용자를 찾을 수 없습니다."));
 
         Optional<UserHasPosts> optional = userHasPostsRepository.findByUser_UserIdAndPostsPostId(userInfo.getUserId(), postid);
@@ -177,7 +177,7 @@ public class PostImgApiLogicService implements CrudInterface<PostImgApiRequest, 
     }
 
     public ArrayList<PostImgReadResponse> allimgread() {
-        User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUsername)
+        User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUid)
                 .orElseThrow(() -> new RuntimeException("token 오류 입니다. 사용자를 찾을 수 없습니다."));
 
         Optional<User> optional = userRepository.findById(userInfo.getUserId());

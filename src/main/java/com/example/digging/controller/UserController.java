@@ -42,13 +42,13 @@ public class UserController {
     public ResponseEntity<User> signup(
             @Valid @RequestBody SignupRequest request
     ) {
-        String oauthId = appleImpl.getAppleSUBIdentity(request.getIdToken());
-        if (oauthId == "not valid id_token") {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ErrorResponse("id_token 오류 입니다. id_token 값이 유효하지 않습니다"));
-
-        }
-        return ResponseEntity.ok(userService.signup(oauthId, request.getUsername(), request.getEmail(), request.getProvider()));
+        String uid = appleImpl.getAppleSUBIdentity(request.getIdToken());
+//        if (uid == "not valid id_token") {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+//                    .body(new ErrorResponse("id_token 오류 입니다. id_token 값이 유효하지 않습니다"));
+//
+//        }
+        return ResponseEntity.ok(userService.signup(uid, request.getUsername(), request.getEmail(), request.getProvider()));
     }
 
     @PostMapping(value = "/login")

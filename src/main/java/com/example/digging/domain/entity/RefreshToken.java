@@ -18,8 +18,7 @@ import java.time.LocalDateTime;
 public class RefreshToken {
 
     @Id
-    @Column(name = "username")
-    private String username;
+    private Integer userId;
 
     private String token;
 

@@ -43,7 +43,7 @@ public class MainPageLogicService {
     private PostTagRepository postTagRepository;
 
     public ArrayList<RecentDiggingResponse> recentPostsRead() {
-        User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUsername)
+        User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUid)
                 .orElseThrow(() -> new RuntimeException("token 오류 입니다. 사용자를 찾을 수 없습니다."));
 
         Optional<User> optional = userRepository.findById(userInfo.getUserId());

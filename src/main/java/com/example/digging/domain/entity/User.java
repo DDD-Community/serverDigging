@@ -26,7 +26,7 @@ public class User {
     private Integer userId;
 
     //고유식별자
-    private String oauthId;
+    private String uid;
 
     private Boolean activated;
 

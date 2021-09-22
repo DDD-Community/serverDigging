@@ -25,7 +25,7 @@ public class UserDto {
     private Integer userId;
 
     //고유식별자
-    private String oauthId;
+    private String uid;
 
 
     @NotNull

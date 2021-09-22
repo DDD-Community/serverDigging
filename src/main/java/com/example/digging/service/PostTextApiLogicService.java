@@ -46,7 +46,7 @@ public class PostTextApiLogicService implements CrudInterface<PostTextApiRequest
     @Override
     public PostTextApiResponse create(PostTextApiRequest request) {
 
-        User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUsername)
+        User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUid)
                 .orElseThrow(() -> new RuntimeException("token 오류 입니다. 사용자를 찾을 수 없습니다."));
 
         PostTextApiRequest body = request;
@@ -131,7 +131,7 @@ public class PostTextApiLogicService implements CrudInterface<PostTextApiRequest
 
     public PostTextReadResponse textread(Integer postid) {
 
-        User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUsername)
+        User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUid)
                 .orElseThrow(() -> new RuntimeException("token 오류 입니다. 사용자를 찾을 수 없습니다."));
 
         Optional<UserHasPosts> optional = userHasPostsRepository.findByUser_UserIdAndPostsPostId(userInfo.getUserId(), postid);
@@ -164,7 +164,7 @@ public class PostTextApiLogicService implements CrudInterface<PostTextApiRequest
     }
 
     public ArrayList<PostTextReadResponse> alltextread() {
-        User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUsername)
+        User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUid)
                 .orElseThrow(() -> new RuntimeException("token 오류 입니다. 사용자를 찾을 수 없습니다."));
 
         Optional<User> optional = userRepository.findById(userInfo.getUserId());

@@ -50,7 +50,7 @@ public class SearchLogicService {
 
     public SearchHeader<ArrayList<RecentDiggingResponse>> searchByKeyword(String keyword) {
 
-        User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUsername)
+        User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUid)
                 .orElseThrow(() -> new RuntimeException("token 오류 입니다. 사용자를 찾을 수 없습니다."));
 
         List<UserHasPosts> userHasPostsList = userHasPostsRepository.findAllByUser_UserId(userInfo.getUserId());
@@ -324,7 +324,7 @@ public class SearchLogicService {
 
     public SearchHeader<ArrayList<RecentDiggingResponse>> searchByTag(String tag) {
 
-        User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUsername)
+        User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUid)
                 .orElseThrow(() -> new RuntimeException("token 오류 입니다. 사용자를 찾을 수 없습니다."));
 
         Optional<Tags> findTag = tagsRepository.findByTagsAndUser_Username(tag, userInfo.getUsername());

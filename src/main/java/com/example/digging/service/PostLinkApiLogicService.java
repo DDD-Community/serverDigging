@@ -49,7 +49,7 @@ public class PostLinkApiLogicService implements CrudInterface<PostLinkApiRequest
     public PostLinkApiResponse create(PostLinkApiRequest request) {
         PostLinkApiRequest body = request;
 
-        User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUsername)
+        User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUid)
                 .orElseThrow(() -> new RuntimeException("token 오류 입니다. 사용자를 찾을 수 없습니다."));
 
         String linkStirng = body.getUrl();
@@ -130,7 +130,7 @@ public class PostLinkApiLogicService implements CrudInterface<PostLinkApiRequest
     }
 
     public PostLinkReadResponse linkread(Integer postid) {
-        User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUsername)
+        User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUid)
                 .orElseThrow(() -> new RuntimeException("token 오류 입니다. 사용자를 찾을 수 없습니다."));
 
         Optional<UserHasPosts> optional = userHasPostsRepository.findByUser_UserIdAndPostsPostId(userInfo.getUserId(), postid);
@@ -194,7 +194,7 @@ public class PostLinkApiLogicService implements CrudInterface<PostLinkApiRequest
     }
 
     public ArrayList<PostLinkReadResponse> alllinkread() {
-        User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUsername)
+        User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUid)
                 .orElseThrow(() -> new RuntimeException("token 오류 입니다. 사용자를 찾을 수 없습니다."));
         Optional<User> optional = userRepository.findById(userInfo.getUserId());
         List<UserHasPosts> userHasPosts = userHasPostsRepository.findAllByUser_UserId(userInfo.getUserId());

@@ -6,26 +6,27 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import com.example.digging.adapter.apple.AppleServiceImpl;
 import com.example.digging.adapter.jwt.TokenProvider;
 import com.example.digging.domain.entity.*;
 import com.example.digging.domain.network.TokenDto;
 import com.example.digging.domain.network.exception.DuplicateMemberException;
 import com.example.digging.domain.network.UserDto;
 import com.example.digging.domain.network.request.LoginRequest;
-import com.example.digging.domain.network.response.GetPostNumByTypeResponse;
-import com.example.digging.domain.network.response.PostsResponse;
-import com.example.digging.domain.network.response.TotalTagResponse;
-import com.example.digging.domain.network.response.UserApiResponse;
+import com.example.digging.domain.network.response.*;
 import com.example.digging.domain.repository.*;
 import com.example.digging.util.SecurityUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 
 @Service
 public class UserService {
@@ -58,19 +59,24 @@ public class UserService {
     @Autowired
     private UserHasPostsRepository userHasPostsRepository;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, TokenProvider tokenProvider, AuthenticationManagerBuilder authenticationManagerBuilder, RefreshTokenRepository refreshTokenRepository) {
+    @Autowired
+    private AppleServiceImpl appleImpl;
+
+
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, TokenProvider tokenProvider, AuthenticationManagerBuilder authenticationManagerBuilder, RefreshTokenRepository refreshTokenRepository, AppleServiceImpl appleService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.tokenProvider = tokenProvider;
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.refreshTokenRepository = refreshTokenRepository;
+        this.appleImpl = appleService;
     }
 
     @Transactional
-    public User signup(String oauthId, String username, String email, String provider) {
+    public User signup(String uid, String userName, String email, String provider) {
 
-        if (userRepository.findOneWithAuthoritiesByOauthId(oauthId).orElse(null) != null) {
-            throw new DuplicateMemberException("username : " + username + "\nprovider : " + userRepository.findByUsernameAndProvider(username, provider).getProvider() + "\nstatus : 이미 가입되어 있는 유저입니다.");
+        if (userRepository.findOneWithAuthoritiesByUid(uid).orElse(null) != null) {
+            throw new DuplicateMemberException("status : 이미 가입되어 있는 유저입니다.");
         }
 
         //빌더 패턴의 장점
@@ -78,23 +84,15 @@ public class UserService {
                 .authorityName("ROLE_USER")
                 .build();
 
-        String makeNewUsername;
-        List<User> sameUsernameList = userRepository.findByUsernameStartsWith(username);
-        int sameUsernameNum = sameUsernameList.size();
-        if (sameUsernameNum > 0 ) {
-            makeNewUsername = username +  Integer.toString(sameUsernameNum + 1);
-        } else {
-            makeNewUsername = username;
-        }
 
         User user = User.builder()
-                .username(makeNewUsername)
-                .password(passwordEncoder.encode(username))
+                .username(userName)
                 .email(email)
+                .password(passwordEncoder.encode(makePwd(provider, uid)))
                 .provider(provider)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
-                .oauthId(oauthId)
+                .uid(uid)
                 .authorities(Collections.singleton(authority))
                 .activated(true)
                 .build();
@@ -102,13 +100,33 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    public String makePwd(String provider, String uid) {
+        if(provider.equals("apple")) {
+            return "${apple.secret}" + uid;
+        } else {
+            return "${google.secret}" + uid;
+        }
+    }
+
+    public String makeUid(String provider, String idToken) {
+        if(provider.equals("apple")) {
+            String uid = appleImpl.getAppleSUBIdentity(idToken);
+            return uid;
+        } else {
+            return "googleuid";
+        }
+    }
+
     @Transactional
     public TokenDto login(LoginRequest request) {
         LoginRequest body = request;
+
+        String uid = makeUid(body.getProvider(), body.getIdToken());
+        String pwd = makePwd(body.getProvider(), uid);
+
         // 1. Login ID/PW 를 기반으로 AuthenticationToken 생성
         UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(body.getUsername(), body.getUsername());
-        //username+provider
+                new UsernamePasswordAuthenticationToken(uid, pwd);
 
         // 2. 실제로 검증 (사용자 비밀번호 체크) 이 이루어지는 부분
         //    authenticate 메서드가 실행이 될 때 CustomUserDetailsService 에서 만들었던 loadUserByUsername 메서드가 실행됨
@@ -117,12 +135,15 @@ public class UserService {
         // 3. 인증 정보를 기반으로 JWT 토큰 생성
         TokenDto jwt = tokenProvider.createToken(authentication);
 
+        System.out.println(authentication);
+        Integer userId = userRepository.findByUid(authentication.getName()).get().getUserId();
+
          // 4. RefreshToken 저장
         RefreshToken savetoken = RefreshToken.builder()
                 .token(jwt.getRefreshToken())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(jwt.getAccessTokenExpiresIn())
-                .username(authentication.getName())
+                .userId(userId)
                 .build();
 
         refreshTokenRepository.save(savetoken);
@@ -142,7 +163,7 @@ public class UserService {
         Authentication authentication = tokenProvider.getAuthentication(access);
 
         // 3. 저장소에서 Member ID 를 기반으로 Refresh Token 값 가져옴
-        RefreshToken refreshToken = refreshTokenRepository.findById(authentication.getName())
+        RefreshToken refreshToken = refreshTokenRepository.findByUserId(userRepository.findByUid(authentication.getName()).get().getUserId())
                 .orElseThrow(() -> new RuntimeException("로그아웃 된 사용자입니다."));
 
         // 4. Refresh Token 일치하는지 검사
@@ -164,9 +185,9 @@ public class UserService {
     @Transactional(readOnly = true)
     public UserDto getUserInfoWithAutorities() {
 
-        Optional<User> userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUsername);
+        Optional<User> userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUid);
 
-        RefreshToken refreshToken = refreshTokenRepository.findById(userInfo.get().getUsername())
+        RefreshToken refreshToken = refreshTokenRepository.findByUserId(userInfo.get().getUserId())
                 .orElseThrow(() -> new RuntimeException("로그아웃 된 사용자입니다."));
 
 
@@ -177,7 +198,7 @@ public class UserService {
                             .email(user.getEmail())
                             .interest(user.getInterest())
                             .userId(user.getUserId())
-                            .oauthId(user.getOauthId())
+                            .uid(user.getUid())
                             .username(user.getUsername())
                             .provider(user.getProvider())
                             .createdAt(user.getCreatedAt())
@@ -192,7 +213,7 @@ public class UserService {
     }
 
     public PostsResponse deletePost(Integer postid) {
-        User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUsername)
+        User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUid)
                 .orElseThrow(() -> new RuntimeException("token 오류 입니다. 사용자를 찾을 수 없습니다."));
 
         Optional<UserHasPosts> optional = userHasPostsRepository.findByUser_UserIdAndPostsPostId(userInfo.getUserId(), postid);
@@ -234,7 +255,7 @@ public class UserService {
     }
 
     public TotalTagResponse getUserTotalTags() {
-        User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUsername)
+        User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUid)
                 .orElseThrow(() -> new RuntimeException("token 오류 입니다. 사용자를 찾을 수 없습니다."));
 
         List<Tags> userTagList = tagsRepository.findAllByUser_UserId(userInfo.getUserId());
@@ -263,7 +284,7 @@ public class UserService {
     }
 
     public PostsResponse setLike(Integer postid) {
-        User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUsername)
+        User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUid)
                 .orElseThrow(() -> new RuntimeException("token 오류 입니다. 사용자를 찾을 수 없습니다."));
 
         Optional<UserHasPosts> optional = userHasPostsRepository.findByUser_UserIdAndPostsPostId(userInfo.getUserId(), postid);
@@ -304,7 +325,7 @@ public class UserService {
 
     public GetPostNumByTypeResponse getPostNumByType() {
 
-        User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUsername)
+        User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUid)
                 .orElseThrow(() -> new RuntimeException("token 오류 입니다. 사용자를 찾을 수 없습니다."));
 
         List<UserHasPosts> userHasPostsList = userHasPostsRepository.findAllByUser_UserId(userInfo.getUserId());
@@ -366,6 +387,6 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public Optional<User> getMyUserWithAuthorities() {
-        return SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUsername);
+        return SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUid);
     }
 }
