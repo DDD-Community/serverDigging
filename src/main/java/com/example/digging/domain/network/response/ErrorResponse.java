@@ -1,11 +1,12 @@
 package com.example.digging.domain.network.response;
 
 import com.example.digging.domain.entity.User;
+import com.example.digging.domain.network.TokenDto;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter @Setter
-public class ErrorResponse extends User {
+public class ErrorResponse extends TokenDto {
     private String errorMessage;
     private String errorCode;
 

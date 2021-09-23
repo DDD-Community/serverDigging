@@ -39,26 +39,26 @@ public class UserController {
 
 
     @PostMapping(value = "/signup")
-    public ResponseEntity<User> signup(
+    public ResponseEntity<TokenDto> signup(
             @Valid @RequestBody SignupRequest request
     ) {
         String uid = appleImpl.getAppleSUBIdentity(request.getIdToken());
-//        if (uid == "not valid id_token") {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-//                    .body(new ErrorResponse("id_token 오류 입니다. id_token 값이 유효하지 않습니다"));
-//
-//        }
-        return ResponseEntity.ok(userService.signup(uid, request.getUsername(), request.getEmail(), request.getProvider()));
+        if (uid == "not valid id_token") {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ErrorResponse("id_token 오류 입니다. id_token 값이 유효하지 않습니다", "404"));
+
+        }
+        return userService.signup(uid, request.getUsername(), request.getEmail(), request.getProvider());
     }
 
     @PostMapping(value = "/login")
     public ResponseEntity<TokenDto> login(@RequestBody LoginRequest request) {
-        return ResponseEntity.ok(userService.login(request));
+        return userService.login(request);
     }
 
     @GetMapping(value = "/reissue", params = { "access_token", "refresh_token" })
     public ResponseEntity<TokenDto> reissue(@RequestParam(name = "access_token") String access_token, @RequestParam(name = "refresh_token") String refresh_token) {
-        return ResponseEntity.ok(userService.reissue(access_token, refresh_token));
+        return userService.reissue(access_token, refresh_token);
     }
 
     @GetMapping("/user")

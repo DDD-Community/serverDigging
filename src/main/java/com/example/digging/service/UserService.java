@@ -73,10 +73,11 @@ public class UserService {
     }
 
     @Transactional
-    public User signup(String uid, String userName, String email, String provider) {
+    public ResponseEntity<TokenDto> signup(String uid, String userName, String email, String provider) {
 
         if (userRepository.findOneWithAuthoritiesByUid(uid).orElse(null) != null) {
-            throw new DuplicateMemberException("status : 이미 가입되어 있는 유저입니다.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ErrorResponse("이미 가입되어 있는 유저입니다", "401"));
         }
 
         //빌더 패턴의 장점
@@ -97,7 +98,9 @@ public class UserService {
                 .activated(true)
                 .build();
 
-        return userRepository.save(user);
+        userRepository.save(user);
+
+        return ResponseEntity.ok(login(uid, provider));
     }
 
     public String makePwd(String provider, String uid) {
@@ -118,11 +121,17 @@ public class UserService {
     }
 
     @Transactional
-    public TokenDto login(LoginRequest request) {
+    public ResponseEntity<TokenDto> login(LoginRequest request) {
         LoginRequest body = request;
 
         String uid = makeUid(body.getProvider(), body.getIdToken());
         String pwd = makePwd(body.getProvider(), uid);
+
+        if (uid == "not valid id_token") {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ErrorResponse("id_token 오류 입니다. id_token 값이 유효하지 않습니다", "404"));
+
+        }
 
         // 1. Login ID/PW 를 기반으로 AuthenticationToken 생성
         UsernamePasswordAuthenticationToken authenticationToken =
@@ -149,14 +158,49 @@ public class UserService {
         refreshTokenRepository.save(savetoken);
 
         // 5. 토큰 발급
+        return ResponseEntity.ok(jwt);
+    }
+
+    @Transactional
+    public TokenDto login(String uid, String provider) {
+
+        String pwd = makePwd(provider, uid);
+
+        // 1. Login ID/PW 를 기반으로 AuthenticationToken 생성
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(uid, pwd);
+
+        // 2. 실제로 검증 (사용자 비밀번호 체크) 이 이루어지는 부분
+        //    authenticate 메서드가 실행이 될 때 CustomUserDetailsService 에서 만들었던 loadUserByUsername 메서드가 실행됨
+        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+
+        // 3. 인증 정보를 기반으로 JWT 토큰 생성
+        TokenDto jwt = tokenProvider.createToken(authentication);
+
+        System.out.println(authentication);
+        Integer userId = userRepository.findByUid(authentication.getName()).get().getUserId();
+
+        // 4. RefreshToken 저장
+        RefreshToken savetoken = RefreshToken.builder()
+                .token(jwt.getRefreshToken())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(jwt.getAccessTokenExpiresIn())
+                .userId(userId)
+                .build();
+
+        refreshTokenRepository.save(savetoken);
+
+        // 5. 토큰 발급
         return jwt;
     }
 
     @Transactional
-    public TokenDto reissue(String access, String refresh) {
+    public ResponseEntity<TokenDto> reissue(String access, String refresh) {
         // 1. Refresh Token 검증
         if (!tokenProvider.validateToken(refresh)) {
-            throw new RuntimeException("Refresh Token 이 유효하지 않습니다.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ErrorResponse("Refresh Token이 유효하지 않습니다", "404"));
+
         }
 
         // 2. Access Token 에서 UserName 가져오기
@@ -168,7 +212,8 @@ public class UserService {
 
         // 4. Refresh Token 일치하는지 검사
         if (!refreshToken.getToken().equals(refresh)) {
-            throw new RuntimeException("토큰의 유저 정보가 일치하지 않습니다.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ErrorResponse("토큰의 유저 정보가 일치하지 않습니다.", "401"));
         }
 
         // 5. 새로운 토큰 생성
@@ -179,7 +224,7 @@ public class UserService {
         refreshTokenRepository.save(newRefreshToken);
 
         // 토큰 발급
-        return tokenDto;
+        return ResponseEntity.ok(tokenDto);
     }
 
     @Transactional(readOnly = true)
