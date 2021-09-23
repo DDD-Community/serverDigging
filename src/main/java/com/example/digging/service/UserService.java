@@ -10,7 +10,7 @@ import com.example.digging.adapter.apple.AppleServiceImpl;
 import com.example.digging.adapter.jwt.TokenProvider;
 import com.example.digging.domain.entity.*;
 import com.example.digging.domain.network.TokenDto;
-import com.example.digging.domain.network.exception.DuplicateMemberException;
+
 import com.example.digging.domain.network.UserDto;
 import com.example.digging.domain.network.request.LoginRequest;
 import com.example.digging.domain.network.response.*;

@@ -2,7 +2,7 @@ package com.example.digging.service;
 
 import com.example.digging.domain.entity.*;
 import com.example.digging.domain.network.Header;
-import com.example.digging.domain.network.exception.DuplicateMemberException;
+
 import com.example.digging.domain.network.request.PostLinkApiRequest;
 import com.example.digging.domain.network.request.PostTextApiRequest;
 import com.example.digging.domain.network.response.PostLinkApiResponse;
