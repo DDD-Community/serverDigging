@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.example.digging.adapter.apple.AppleServiceImpl;
+import com.example.digging.adapter.google.GoogleServiceImpl;
 import com.example.digging.adapter.jwt.TokenProvider;
 import com.example.digging.domain.entity.*;
 import com.example.digging.domain.network.TokenDto;
@@ -32,11 +33,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-
     private final TokenProvider tokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
-
     private final RefreshTokenRepository refreshTokenRepository;
+    private final AppleServiceImpl appleImpl;
+    private final GoogleServiceImpl googleImpl;
 
     @Autowired
     private TagsRepository tagsRepository;
@@ -59,17 +60,16 @@ public class UserService {
     @Autowired
     private UserHasPostsRepository userHasPostsRepository;
 
-    @Autowired
-    private AppleServiceImpl appleImpl;
 
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, TokenProvider tokenProvider, AuthenticationManagerBuilder authenticationManagerBuilder, RefreshTokenRepository refreshTokenRepository, AppleServiceImpl appleService) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, TokenProvider tokenProvider, AuthenticationManagerBuilder authenticationManagerBuilder, RefreshTokenRepository refreshTokenRepository, AppleServiceImpl appleService, GoogleServiceImpl googleService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.tokenProvider = tokenProvider;
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.refreshTokenRepository = refreshTokenRepository;
         this.appleImpl = appleService;
+        this.googleImpl = googleService;
     }
 
     @Transactional
@@ -116,7 +116,8 @@ public class UserService {
             String uid = appleImpl.getAppleSUBIdentity(idToken);
             return uid;
         } else {
-            return "googleuid";
+            String uid = googleImpl.verifyAndGetUid(idToken);
+            return uid;
         }
     }
 
@@ -131,6 +132,10 @@ public class UserService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ErrorResponse("id_token 오류 입니다. id_token 값이 유효하지 않습니다", "404"));
 
+        }
+        if (uid == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ErrorResponse("id_token 오류 입니다. UID를 로드할 수 없습니다.", "404"));
         }
 
         // 1. Login ID/PW 를 기반으로 AuthenticationToken 생성

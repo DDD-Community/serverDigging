@@ -1,6 +1,6 @@
-package com.example.digging.util;
+package com.example.digging.adapter.apple;
 
-import com.example.digging.adapter.apple.TokenResponse;
+import com.example.digging.util.HttpClientUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.RSASSAVerifier;
@@ -12,7 +12,6 @@ import java.util.Base64;
 import java.util.Base64.Decoder;
 
 
-import net.minidev.json.JSONObject;
 import org.springframework.stereotype.Component;
 
 import java.io.UnsupportedEncodingException;

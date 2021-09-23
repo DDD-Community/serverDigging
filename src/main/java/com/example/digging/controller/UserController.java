@@ -1,6 +1,7 @@
 package com.example.digging.controller;
 
 import com.example.digging.adapter.apple.AppleServiceImpl;
+import com.example.digging.adapter.google.GoogleServiceImpl;
 import com.example.digging.domain.entity.User;
 import com.example.digging.domain.network.TokenDto;
 import com.example.digging.domain.network.UserDto;
@@ -30,11 +31,13 @@ import javax.validation.Valid;
 public class UserController {
     private final UserService userService;
     private final AppleServiceImpl appleImpl;
+    private final GoogleServiceImpl googleImpl;
 
-    public UserController(UserService userService, AppleServiceImpl appleImpl) {
+    public UserController(UserService userService, AppleServiceImpl appleImpl, GoogleServiceImpl googleImpl) {
 
         this.userService = userService;
         this.appleImpl = appleImpl;
+        this.googleImpl = googleImpl;
     }
 
 
@@ -42,13 +45,34 @@ public class UserController {
     public ResponseEntity<TokenDto> signup(
             @Valid @RequestBody SignupRequest request
     ) {
-        String uid = appleImpl.getAppleSUBIdentity(request.getIdToken());
-        if (uid == "not valid id_token") {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ErrorResponse("id_token 오류 입니다. id_token 값이 유효하지 않습니다", "404"));
+        if (request.getProvider().equals("apple")) {
+            String uid = appleImpl.getAppleSUBIdentity(request.getIdToken());
+            if (uid == "not valid id_token") {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new ErrorResponse("id_token 오류 입니다. id_token 값이 유효하지 않습니다", "404"));
 
+            }
+            return userService.signup(uid, request.getUsername(), request.getEmail(), request.getProvider());
+        } else {
+            String uid = googleImpl.verifyAndGetUid(request.getIdToken());
+            String username = googleImpl.verifyAndGetUsername(request.getIdToken());
+            String email = googleImpl.verifyAndGetEmail(request.getIdToken());
+            if (uid == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new ErrorResponse("id_token 오류 입니다. UID를 로드할 수 없습니다.", "404"));
+            }
+            if (username == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new ErrorResponse("id_token 오류 입니다. Username을 로드할 수 없습니다.", "404"));
+            }
+            if (email == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new ErrorResponse("id_token 오류 입니다. Email을 로드할 수 없습니다.", "404"));
+            }
+
+            return userService.signup(uid, username, email, request.getProvider());
         }
-        return userService.signup(uid, request.getUsername(), request.getEmail(), request.getProvider());
+
     }
 
     @PostMapping(value = "/login")

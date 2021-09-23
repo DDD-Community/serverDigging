@@ -58,6 +58,7 @@ dependencies {
     implementation platform('com.amazonaws:aws-java-sdk-bom:1.11.228')
     implementation 'com.amazonaws:aws-java-sdk-s3'
 
+    compile 'com.google.api-client:google-api-client:1.32.1'
 }
 
 test {

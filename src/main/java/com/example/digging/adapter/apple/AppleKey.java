@@ -1,4 +1,4 @@
-package com.example.digging.util;
+package com.example.digging.adapter.apple;
 
 public class AppleKey {
 
