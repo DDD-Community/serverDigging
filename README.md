@@ -4,7 +4,7 @@
 ## *Introduction*
 
 ### About Digging
-[Digging behance]: https://www.behance.net/gallery/120417383/digging-idea-APP-UI-UX-design
+[Digging behance](https://www.behance.net/gallery/120417383/digging-idea-APP-UI-UX-design)
 
 *Let's collect ideas with `Digging` !*
 
