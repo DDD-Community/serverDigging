@@ -9,4 +9,9 @@ public class TokenResponse {
 
     public String sub;
 
+    public String id;
+
+    public String name;
+
+    public String email;
 }

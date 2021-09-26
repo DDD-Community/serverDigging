@@ -59,6 +59,7 @@ dependencies {
     implementation 'com.amazonaws:aws-java-sdk-s3'
 
     compile 'com.google.api-client:google-api-client:1.32.1'
+
 }
 
 test {
