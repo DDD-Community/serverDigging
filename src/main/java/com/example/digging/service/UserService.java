@@ -73,7 +73,7 @@ public class UserService {
     }
 
     @Transactional
-    public ResponseEntity<TokenDto> signup(String uid, String userName, String email, String provider) {
+    public ResponseEntity<TokenDto> signup(String uid, String email, String provider) {
 
         if (userRepository.findOneWithAuthoritiesByUid(uid).orElse(null) != null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -87,7 +87,7 @@ public class UserService {
 
 
         User user = User.builder()
-                .username(userName)
+                .username("이름없음")
                 .email(email)
                 .password(passwordEncoder.encode(makePwd(provider, uid)))
                 .provider(provider)
@@ -111,12 +111,12 @@ public class UserService {
         }
     }
 
-    public String makeUid(String provider, String idToken) {
+    public String makeUid(String provider, String token) {
         if(provider.equals("apple")) {
-            String uid = appleImpl.getAppleSUBIdentity(idToken);
+            String uid = appleImpl.getAppleSUBIdentity(token);
             return uid;
         } else {
-            String uid = googleImpl.verifyAndGetUid(idToken);
+            String uid = googleImpl.verifyAndGetUid(token);
             return uid;
         }
     }
@@ -125,17 +125,17 @@ public class UserService {
     public ResponseEntity<TokenDto> login(LoginRequest request) {
         LoginRequest body = request;
 
-        String uid = makeUid(body.getProvider(), body.getIdToken());
+        String uid = makeUid(body.getProvider(), body.getToken());
         String pwd = makePwd(body.getProvider(), uid);
 
         if (uid == "not valid id_token") {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ErrorResponse("id_token 오류 입니다. id_token 값이 유효하지 않습니다", "404"));
+                    .body(new ErrorResponse("token 오류 입니다. token 값이 유효하지 않습니다", "404"));
 
         }
         if (uid == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ErrorResponse("id_token 오류 입니다. UID를 로드할 수 없습니다.", "404"));
+                    .body(new ErrorResponse("token 오류 입니다. token 값이 유효하지 않습니다", "404"));
         }
 
         // 1. Login ID/PW 를 기반으로 AuthenticationToken 생성

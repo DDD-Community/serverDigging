@@ -1,8 +1,5 @@
 package com.example.digging.adapter.google;
 
-import com.example.digging.adapter.apple.AppleUtil;
-
-
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import lombok.RequiredArgsConstructor;
@@ -61,73 +58,5 @@ public class GoogleServiceImpl {
 
     }
 
-    @Transactional
-    public String verifyAndGetUsername(String AccessToken) {
-        //String reqURL = "https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token="+access_Token;
-        String reqURL = "https://www.googleapis.com/userinfo/v2/me?access_token="+AccessToken;
-        try {
-            URL url = new URL(reqURL);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
-            //요청에 필요한 Header에 포함될 내용
-            conn.setRequestProperty("Authorization", "Bearer " + AccessToken);
-            int responseCode = conn.getResponseCode();
-            System.out.println("responseCode : "+responseCode);
-            if(responseCode == 200){
-                BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                String line = "";
-                String result = "";
-                while ((line = br.readLine()) != null) {
-                    result += line;
-                }
-//                JsonParser parser = new JsonParser();
-
-                System.out.println("result : "+result);
-                JsonParser parser = new JsonParser();
-                JsonElement element = parser.parse(result);
-                String name = element.getAsJsonObject().get("name").getAsString();
-
-                return name;
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-
-    }
-
-    @Transactional
-    public String verifyAndGetEmail(String AccessToken) {
-        //String reqURL = "https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token="+access_Token;
-        String reqURL = "https://www.googleapis.com/userinfo/v2/me?access_token="+AccessToken;
-        try {
-            URL url = new URL(reqURL);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-
-            //요청에 필요한 Header에 포함될 내용
-            conn.setRequestProperty("Authorization", "Bearer " + AccessToken);
-            int responseCode = conn.getResponseCode();
-            System.out.println("responseCode : "+responseCode);
-            if(responseCode == 200){
-                BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                String line = "";
-                String result = "";
-                while ((line = br.readLine()) != null) {
-                    result += line;
-                }
-//                JsonParser parser = new JsonParser();
-
-                System.out.println("result : "+result);
-                JsonParser parser = new JsonParser();
-                JsonElement element = parser.parse(result);
-                String email = element.getAsJsonObject().get("email").getAsString();
-
-                return email;
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-
-    }
 }

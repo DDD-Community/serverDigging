@@ -46,31 +46,22 @@ public class UserController {
             @Valid @RequestBody SignupRequest request
     ) {
         if (request.getProvider().equals("apple")) {
-            String uid = appleImpl.getAppleSUBIdentity(request.getIdToken());
+            String uid = appleImpl.getAppleSUBIdentity(request.getToken());
             if (uid == "not valid id_token") {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body(new ErrorResponse("id_token 오류 입니다. id_token 값이 유효하지 않습니다", "404"));
 
             }
-            return userService.signup(uid, request.getUsername(), request.getEmail(), request.getProvider());
+            return userService.signup(uid, request.getEmail(), request.getProvider());
         } else {
-            String uid = googleImpl.verifyAndGetUid(request.getIdToken());
-            String username = googleImpl.verifyAndGetUsername(request.getIdToken());
-            String email = googleImpl.verifyAndGetEmail(request.getIdToken());
+            String uid = googleImpl.verifyAndGetUid(request.getToken());
+            String email = request.getEmail();
             if (uid == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(new ErrorResponse("id_token 오류 입니다. UID를 로드할 수 없습니다.", "404"));
-            }
-            if (username == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(new ErrorResponse("id_token 오류 입니다. Username을 로드할 수 없습니다.", "404"));
-            }
-            if (email == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(new ErrorResponse("id_token 오류 입니다. Email을 로드할 수 없습니다.", "404"));
+                        .body(new ErrorResponse("access_token 오류 입니다. UID를 로드할 수 없습니다.", "404"));
             }
 
-            return userService.signup(uid, username, email, request.getProvider());
+            return userService.signup(uid, email, request.getProvider());
         }
 
     }
