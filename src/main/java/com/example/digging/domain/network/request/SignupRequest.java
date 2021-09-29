@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class SignupRequest {
     private String token;
-    private String email;
     private String provider;
 
 }

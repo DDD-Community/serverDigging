@@ -33,7 +33,7 @@ public class GoogleServiceImpl {
             //요청에 필요한 Header에 포함될 내용
             conn.setRequestProperty("Authorization", "Bearer " + AccessToken);
             int responseCode = conn.getResponseCode();
-            System.out.println("responseCode : "+responseCode);
+
             if(responseCode == 200){
                 BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                 String line = "";
@@ -41,9 +41,7 @@ public class GoogleServiceImpl {
                 while ((line = br.readLine()) != null) {
                     result += line;
                 }
-//                JsonParser parser = new JsonParser();
 
-                System.out.println("result : "+result);
                 JsonParser parser = new JsonParser();
                 JsonElement element = parser.parse(result);
 
@@ -69,7 +67,7 @@ public class GoogleServiceImpl {
             //요청에 필요한 Header에 포함될 내용
             conn.setRequestProperty("Authorization", "Bearer " + AccessToken);
             int responseCode = conn.getResponseCode();
-            System.out.println("responseCode : "+responseCode);
+
             if(responseCode == 200){
                 BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                 String line = "";
@@ -77,9 +75,7 @@ public class GoogleServiceImpl {
                 while ((line = br.readLine()) != null) {
                     result += line;
                 }
-//                JsonParser parser = new JsonParser();
 
-                System.out.println("result : "+result);
                 JsonParser parser = new JsonParser();
                 JsonElement element = parser.parse(result);
 
