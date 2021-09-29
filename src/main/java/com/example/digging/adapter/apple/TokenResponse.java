@@ -11,4 +11,5 @@ public class TokenResponse {
 
     public String id;
 
+    public String email;
 }

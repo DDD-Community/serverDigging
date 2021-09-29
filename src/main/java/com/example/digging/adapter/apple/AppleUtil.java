@@ -74,7 +74,7 @@ public class AppleUtil {
         return false;
     }
 
-    public String decode(String token) {
+    public String decodeUid(String token) {
 
         String[] splitToken = token.split("\\.");
         Decoder decoder = Base64.getDecoder();
@@ -89,6 +89,28 @@ public class AppleUtil {
             TokenResponse tokenResponse = gsons.fromJson(decodedString, TokenResponse.class);
 
             return tokenResponse.getSub();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            return decodedString;
+        }
+
+    }
+
+    public String decodeEmail(String token) {
+
+        String[] splitToken = token.split("\\.");
+        Decoder decoder = Base64.getDecoder();
+        byte[] decodedBytes = decoder.decode(splitToken[1]);
+
+        String decodedString = null;
+        try {
+            decodedString = new String(decodedBytes, "UTF-8");
+
+            Gson gsons = new Gson();
+
+            TokenResponse tokenResponse = gsons.fromJson(decodedString, TokenResponse.class);
+
+            return tokenResponse.getEmail();
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
             return decodedString;

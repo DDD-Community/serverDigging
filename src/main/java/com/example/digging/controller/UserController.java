@@ -47,21 +47,22 @@ public class UserController {
     ) {
         if (request.getProvider().equals("apple")) {
             String uid = appleImpl.getAppleSUBIdentity(request.getToken());
+            String useremail = appleImpl.getAppleEmailIdentity(request.getToken());
             if (uid == "not valid id_token") {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body(new ErrorResponse("id_token 오류 입니다. id_token 값이 유효하지 않습니다", "404"));
 
             }
-            return userService.signup(uid, request.getEmail(), request.getProvider());
+            return userService.signup(uid, useremail, request.getProvider());
         } else {
             String uid = googleImpl.verifyAndGetUid(request.getToken());
-            String email = request.getEmail();
+            String useremail = googleImpl.verifyAndGetEmail(request.getToken());
             if (uid == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body(new ErrorResponse("access_token 오류 입니다. UID를 로드할 수 없습니다.", "404"));
             }
 
-            return userService.signup(uid, email, request.getProvider());
+            return userService.signup(uid, useremail, request.getProvider());
         }
 
     }
