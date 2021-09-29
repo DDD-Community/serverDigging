@@ -495,7 +495,7 @@ public class UserService {
     }
 
     public boolean isValidNickname(String username) {
-        if (username.length() > 5) {
+        if (username.length() > 5 || username.length() < 1) {
             return Boolean.FALSE;
         } else {
             for (int i=0;i<username.length();i++) {
