@@ -23,4 +23,10 @@ public class SearchHeader<T> {
                 .postsList(data)
                 .build();
     }
+
+    public static <T> SearchHeader<T> NO() {
+        return (SearchHeader<T>) SearchHeader.builder()
+                .totalPostsNum(0)
+                .build();
+    }
 }
