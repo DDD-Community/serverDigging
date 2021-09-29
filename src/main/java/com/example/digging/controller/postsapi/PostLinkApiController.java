@@ -35,13 +35,13 @@ public class PostLinkApiController {
 
 
     @GetMapping("")
-    public PostLinkReadResponse linkread(@RequestParam(name = "postid") Integer postid) {
+    public ResponseEntity<PostLinkReadResponse> linkread(@RequestParam(name = "postid") Integer postid) {
         log.info("[READ LINK] : post {}", postid);
         return postLinkApiLogicService.linkread(postid);
     }
 
     @GetMapping("/all_link_read")
-    public ArrayList<PostLinkReadResponse> alllinkread() {
+    public ResponseEntity<ArrayList<PostLinkReadResponse>> alllinkread() {
         log.info("[READ All Link]" );
         return postLinkApiLogicService.alllinkread();
     }

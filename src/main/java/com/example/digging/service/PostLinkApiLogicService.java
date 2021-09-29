@@ -121,12 +121,12 @@ public class PostLinkApiLogicService {
 
         }else{
             PostLinkApiResponse error = PostLinkApiResponse.builder().resultCode("Error : 유효하지 않은 URL").build();
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
     }
 
 
-    public PostLinkReadResponse linkread(Integer postid) {
+    public ResponseEntity<PostLinkReadResponse> linkread(Integer postid) {
         User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUid)
                 .orElseThrow(() -> new RuntimeException("token 오류 입니다. 사용자를 찾을 수 없습니다."));
 
@@ -144,18 +144,18 @@ public class PostLinkApiLogicService {
                     return linkopt
                             .map(posts -> {
                                 PostLink readPost = posts;
-                                return readres(readPost, tagList);
+                                return ResponseEntity.ok(readres(readPost, tagList));
                             })
                             .orElseGet(() -> {
                                 PostLinkReadResponse error = PostLinkReadResponse.builder().resultCode("Error : post 정보 없음").build();
-                                return error;
+                                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
                                     }
                             );
                 })
                 .orElseGet(
                         () -> {
                             PostLinkReadResponse error = PostLinkReadResponse.builder().resultCode("Error : user id, post id 오류").build();
-                            return error;
+                            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
                         }
                 );
 
@@ -179,7 +179,7 @@ public class PostLinkApiLogicService {
         return postLinkReadResponse;
     }
 
-    public ArrayList<PostLinkReadResponse> alllinkread() {
+    public ResponseEntity<ArrayList<PostLinkReadResponse>> alllinkread() {
         User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUid)
                 .orElseThrow(() -> new RuntimeException("token 오류 입니다. 사용자를 찾을 수 없습니다."));
         Optional<User> optional = userRepository.findById(userInfo.getUserId());
@@ -201,12 +201,12 @@ public class PostLinkApiLogicService {
             }
         }
         System.out.println(tags);
-        return optional.map(user -> allreadres(postLinks, tags))
+        return optional.map(user -> ResponseEntity.ok(allreadres(postLinks, tags)))
                 .orElseGet(()->{
                     ArrayList<PostLinkReadResponse> errorList = new ArrayList<PostLinkReadResponse>();
                     PostLinkReadResponse error = PostLinkReadResponse.builder().resultCode("Error").build();
                     errorList.add(error);
-                    return errorList;
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorList);
                 });
 
     }
