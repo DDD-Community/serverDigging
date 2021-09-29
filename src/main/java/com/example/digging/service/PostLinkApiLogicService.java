@@ -12,6 +12,8 @@ import com.example.digging.util.SecurityUtil;
 import com.example.digging.util.UrlTypeValidation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.support.NullValue;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 
@@ -21,7 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class PostLinkApiLogicService implements CrudInterface<PostLinkApiRequest, PostLinkApiResponse> {
+public class PostLinkApiLogicService {
 
     @Autowired
     private UserRepository userRepository;
@@ -45,8 +47,7 @@ public class PostLinkApiLogicService implements CrudInterface<PostLinkApiRequest
     private PostTagRepository postTagRepository;
 
 
-    @Override
-    public PostLinkApiResponse create(PostLinkApiRequest request) {
+    public ResponseEntity<PostLinkApiResponse> create(PostLinkApiRequest request) {
         PostLinkApiRequest body = request;
 
         User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUid)
@@ -115,19 +116,15 @@ public class PostLinkApiLogicService implements CrudInterface<PostLinkApiRequest
                     .build();
             PostLink newPostLink = postLinkRepository.save(postLink);
 
-            return response(newPostLink, "Valid Url", newTagList);
+            return ResponseEntity.ok(response(newPostLink, "Valid Url", newTagList));
 
 
         }else{
             PostLinkApiResponse error = PostLinkApiResponse.builder().resultCode("Error : 유효하지 않은 URL").build();
-            return error;
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
         }
     }
 
-    @Override
-    public PostLinkApiResponse read(Integer id) {
-        return null;
-    }
 
     public PostLinkReadResponse linkread(Integer postid) {
         User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUid)
@@ -163,17 +160,6 @@ public class PostLinkApiLogicService implements CrudInterface<PostLinkApiRequest
                 );
 
     }
-
-    @Override
-    public PostLinkApiResponse update(Integer id, PostLinkApiRequest request) {
-        return null;
-    }
-
-    @Override
-    public PostLinkApiResponse delete(Integer id) {
-        return null;
-    }
-
 
     private PostLinkReadResponse readres(PostLink postLink, ArrayList<String> tags) {
         PostLinkReadResponse postLinkReadResponse = PostLinkReadResponse.builder()

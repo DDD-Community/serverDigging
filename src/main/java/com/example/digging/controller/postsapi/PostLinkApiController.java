@@ -13,6 +13,7 @@ import com.example.digging.service.UserApiLogicService;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -21,21 +22,17 @@ import java.util.ArrayList;
 @RestController
 @RequestMapping("/postlink")
 @Api
-public class PostLinkApiController implements CrudInterface<PostLinkApiRequest, PostLinkApiResponse> {
+public class PostLinkApiController {
     @Autowired
     private PostLinkApiLogicService postLinkApiLogicService;
 
-    @Override
+
     @PostMapping("")
-    public PostLinkApiResponse create(@RequestBody PostLinkApiRequest request) {
+    public ResponseEntity<PostLinkApiResponse> create(@RequestBody PostLinkApiRequest request) {
         log.info("{}", request);
         return postLinkApiLogicService.create(request);
     }
 
-    @Override
-    public PostLinkApiResponse read(Integer id) {
-        return null;
-    }
 
     @GetMapping("")
     public PostLinkReadResponse linkread(@RequestParam(name = "postid") Integer postid) {
@@ -49,13 +46,4 @@ public class PostLinkApiController implements CrudInterface<PostLinkApiRequest, 
         return postLinkApiLogicService.alllinkread();
     }
 
-    @Override
-    public PostLinkApiResponse update(Integer id, PostLinkApiRequest request) {
-        return null;
-    }
-
-    @Override
-    public PostLinkApiResponse delete(Integer id) {
-        return null;
-    }
 }
