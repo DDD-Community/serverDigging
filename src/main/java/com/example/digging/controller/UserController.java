@@ -8,6 +8,7 @@ import com.example.digging.domain.network.UserDto;
 import com.example.digging.domain.network.request.LoginRequest;
 import com.example.digging.domain.network.request.PostLinkApiRequest;
 import com.example.digging.domain.network.request.SignupRequest;
+import com.example.digging.domain.network.request.UpdateUserRequest;
 import com.example.digging.domain.network.response.ErrorResponse;
 import com.example.digging.domain.network.response.GetPostNumByTypeResponse;
 import com.example.digging.domain.network.response.PostsResponse;
@@ -109,4 +110,8 @@ public class UserController {
         return userService.deletePost(postid);
     }
 
+    @PutMapping("/user")
+    public ResponseEntity<UserDto> updateUser(@RequestBody UpdateUserRequest updateUserRequest){
+        return userService.updateUser(updateUserRequest);
+    }
 }

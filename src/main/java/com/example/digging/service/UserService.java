@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import com.example.digging.adapter.apple.AppleServiceImpl;
 import com.example.digging.adapter.google.GoogleServiceImpl;
@@ -14,6 +15,7 @@ import com.example.digging.domain.network.TokenDto;
 
 import com.example.digging.domain.network.UserDto;
 import com.example.digging.domain.network.request.LoginRequest;
+import com.example.digging.domain.network.request.UpdateUserRequest;
 import com.example.digging.domain.network.response.*;
 import com.example.digging.domain.repository.*;
 import com.example.digging.util.SecurityUtil;
@@ -262,6 +264,58 @@ public class UserService {
                 .orElseThrow();
     }
 
+    @Transactional
+    public ResponseEntity<UserDto> updateUser(UpdateUserRequest updateUserRequest) {
+        Optional<User> userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUid);
+        UpdateUserRequest body = updateUserRequest;
+
+        Boolean emailCheck = isValidEmailAddress(body.getEmail());
+        Boolean nicknameCheck = isValidNickname(body.getUsername());
+
+        if (!emailCheck && !nicknameCheck) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new UpdateUserErrorResponse("닉네임은 한글, 영어 소문자, 숫자 중 5자 이내로 작성해주세요", "올바른 형식의 이메일을 입력해주세요"));
+        }
+        if (!nicknameCheck && emailCheck) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new UpdateUserErrorResponse(Boolean.TRUE, Boolean.FALSE, "닉네임은 한글, 영어 소문자, 숫자 중 5자 이내로 작성해주세요"));
+        }
+
+        if (nicknameCheck && !emailCheck) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new UpdateUserErrorResponse(Boolean.FALSE, Boolean.TRUE, "올바른 형식의 이메일을 입력해주세요"));
+        }
+
+        return userInfo.map(user -> {
+            user
+                    .setUpdatedAt(LocalDateTime.now())
+                    .setUsername(body.getUsername())
+                    .setEmail(body.getEmail())
+                    .setInterest(body.getInterest())
+            ;
+            return user;
+        })
+                .map(user -> userRepository.save(user))
+                .map(user -> {
+                    UserDto userDto = UserDto.builder()
+                            .email(user.getEmail())
+                            .interest(user.getInterest())
+                            .userId(user.getUserId())
+                            .uid(user.getUid())
+                            .username(user.getUsername())
+                            .provider(user.getProvider())
+                            .createdAt(user.getCreatedAt())
+                            .updatedAt(user.getUpdatedAt())
+                            .activated(user.getActivated())
+                            .refreshTokenCreatedAt(refreshTokenRepository.findByUserId(user.getUserId()).get().getCreatedAt())
+                            .refreshTokenUpdatedAt(refreshTokenRepository.findByUserId(user.getUserId()).get().getUpdatedAt())
+                            .build();
+                    return ResponseEntity.ok(userDto);
+
+                })
+                .orElseThrow();
+    }
+
     public PostsResponse deletePost(Integer postid) {
         User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUid)
                 .orElseThrow(() -> new RuntimeException("token 오류 입니다. 사용자를 찾을 수 없습니다."));
@@ -433,7 +487,29 @@ public class UserService {
         return postsResponse;
     }
 
+    public boolean isValidEmailAddress(String email) {
+        String ePattern = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$";
+        java.util.regex.Pattern p = java.util.regex.Pattern.compile(ePattern);
+        java.util.regex.Matcher m = p.matcher(email);
+        return m.matches();
+    }
 
+    public boolean isValidNickname(String username) {
+        if (username.length() > 5) {
+            return Boolean.FALSE;
+        } else {
+            for (int i=0;i<username.length();i++) {
+                boolean a = Pattern.matches("^[a-z]*$", Character.toString(username.charAt(i)));
+                boolean b = Pattern.matches("^[0-9]*$", Character.toString(username.charAt(i)));
+                boolean c = Pattern.matches("^[ㄱ-ㅎ가-힣]*$", Character.toString(username.charAt(i)));
+                if(!a && !b && !c) {
+                    return Boolean.FALSE;
+                }
+            }
+            return Boolean.TRUE;
+        }
+
+    }
 
     @Transactional(readOnly = true)
     public Optional<User> getMyUserWithAuthorities() {
