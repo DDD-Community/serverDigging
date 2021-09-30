@@ -44,15 +44,6 @@ public class SearchHeader<T> {
                 .build();
     }
 
-    public static <T> SearchHeader<T> OK(Integer totalnum, T data) {
-        Integer divres = (int)Math.ceil((double)totalnum / (double) 10);
-        return (SearchHeader<T>) SearchHeader.builder()
-                .totalPostsNum(totalnum)
-                .totalPagesNum(divres)
-                .pageSize(10)
-                .postsList(data)
-                .build();
-    }
 
     public static <T> SearchHeader<T> NO() {
         return (SearchHeader<T>) SearchHeader.builder()
@@ -61,9 +52,15 @@ public class SearchHeader<T> {
                 .build();
     }
 
-    public static <T> SearchHeader<T> NO(Integer totalnum) {
+    public static <T> SearchHeader<T> NO(Integer totalnum, Integer totalPnum, Integer nowP) {
         return (SearchHeader<T>) SearchHeader.builder()
                 .totalPostsNum(totalnum)
+                .totalPagesNum(totalPnum)
+                .pageNum(nowP)
+                .pageSize(10)
+                .nowSize(0)
+                .isFirst(Boolean.FALSE)
+                .isLast(Boolean.FALSE)
                 .postsList(new ArrayList<>())
                 .build();
     }

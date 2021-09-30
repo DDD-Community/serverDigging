@@ -29,9 +29,10 @@ public class SearchController {
     }
 
     @GetMapping(value = "/keyword", params = { "keyword", "page" })
-    public SearchHeader<ArrayList<RecentDiggingResponse>> searchByKeywordWithPage(@RequestParam(name = "keyword") String keyword, @RequestParam(name = "page") Integer nowpage) {
-        log.info("[SEARCH by Keyword] : {}", keyword, nowpage);
-        return searchLogicService.searchByKeyword(keyword, nowpage);
+    public SearchHeader<ArrayList<RecentDiggingResponse>> searchByKeywordWithPage(@RequestParam(name = "keyword") String keyword, @RequestParam(name = "page") Integer page) {
+        log.info("[SEARCH by Keyword] : {}", keyword, page);
+        System.out.println(page);
+        return searchLogicService.searchByKeyword(keyword, page);
     }
 
     @GetMapping(value = "/tag", params = { "tag" })

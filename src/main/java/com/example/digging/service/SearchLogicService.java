@@ -166,11 +166,7 @@ public class SearchLogicService {
                 }
             }
         }
-        System.out.println(LocalDateTime.now());
-        System.out.println(1/3 + 1%3);
-        System.out.println(4/3 + 4%3);
-        System.out.println(3/3 + 3%3);
-        System.out.println(6/3 + 3%3);
+
         List<Integer> keySetList = new ArrayList<>(map.keySet());
         if(keySetList.size() == 0) {
             return SearchHeader.NO();
@@ -178,10 +174,10 @@ public class SearchLogicService {
 
         Integer totalpagenum = (int)Math.ceil((double)keySetList.size() / (double) 10);
         if(totalpagenum < nowpage) {
-            return SearchHeader.NO(totalpagenum);
+            return SearchHeader.NO(keySetList.size(), totalpagenum, nowpage);
         }
         List<Integer> valueSetList = new ArrayList<>();
-        System.out.println(LocalDateTime.now());
+
         // KeyWord 언급 내림차순
         Collections.sort(keySetList, (o1, o2) -> (map.get(o2).compareTo(map.get(o1))));
 
@@ -209,11 +205,11 @@ public class SearchLogicService {
             hashSet.add(item);
         }
 
-        System.out.println(LocalDateTime.now());
+
         ArrayList<Optional<Posts>> orderPostsList = new ArrayList<>();
-        System.out.println("!!!!");
+
         PagingInfo pInfo = pageInfo(keySetList, nowpage);
-        System.out.println(LocalDateTime.now());
+
         for(int r=0;r<keySetList.size();r++) {
 
             if(!hashSet.contains(valueSetList.get(r))) {
@@ -235,7 +231,7 @@ public class SearchLogicService {
                 }
             }
         }
-        System.out.println(LocalDateTime.now());
+
 
         ArrayList<RecentDiggingResponse> keywordDiggingList = new ArrayList<RecentDiggingResponse>();
         for(int i =pInfo.getStartNum(); i<(pInfo.getStartNum() + pInfo.getNowSize()); i++){
@@ -328,9 +324,8 @@ public class SearchLogicService {
             }
         }
 
-        System.out.println(LocalDateTime.now());
-//        return SearchHeader.OK(orderPostsList.size(), pInfo.getPageNum(), pInfo.getNowSize(), pInfo.getIsFirst(), pInfo.getIsLast(), keywordDiggingList);
-        return SearchHeader.OK(orderPostsList.size(), keywordDiggingList);
+        return SearchHeader.OK(orderPostsList.size(), pInfo.getPageNum(), pInfo.getNowSize(), pInfo.getIsFirst(), pInfo.getIsLast(), keywordDiggingList);
+
     }
 
     public SearchHeader<ArrayList<RecentDiggingResponse>> searchByTag(String tag, Integer page) {
@@ -345,6 +340,11 @@ public class SearchLogicService {
 
             Integer postsTotalNum = postTagList.size();
 
+            Integer totalpagenum = (int)Math.ceil((double)postsTotalNum / (double) 10);
+            if(totalpagenum < page) {
+                return SearchHeader.NO(postsTotalNum, totalpagenum, page);
+            }
+
             ArrayList<Posts> postsList = new ArrayList<>();
             Map<Integer, LocalDateTime> map = new LinkedHashMap<>();
             ArrayList<Optional<Posts>> orderPostsList = new ArrayList<>();
@@ -358,9 +358,10 @@ public class SearchLogicService {
             for (Integer key : result.keySet()) {
                 orderPostsList.add(postsRepository.findById(key));
             }
+            PagingInfo pInfo = pageInfo(orderPostsList, page);
 
             ArrayList<RecentDiggingResponse> recentDiggingList = new ArrayList<RecentDiggingResponse>();
-            for(int i =0; i<postsTotalNum; i++){
+            for(int i =pInfo.getStartNum(); i<(pInfo.getStartNum() + pInfo.getNowSize()); i++){
                 if(orderPostsList.get(i).get().getIsLink() == Boolean.TRUE) {
                     PostLink newlink = postLinkRepository.findByPostsPostId(orderPostsList.get(i).get().getPostId());
                     List<PostTag> nowTags = postTagRepository.findAllByPostsPostId(orderPostsList.get(i).get().getPostId());
@@ -455,14 +456,16 @@ public class SearchLogicService {
             for(int i=0;i<number;i++) {
                 orderrecentDiggingList.add(recentDiggingList.get(number-i-1));
             }
-            return SearchHeader.OK(orderrecentDiggingList.size(), orderrecentDiggingList);
+
+            return SearchHeader.OK(orderPostsList.size(), pInfo.getPageNum(), pInfo.getNowSize(), pInfo.getIsFirst(), pInfo.getIsLast(), orderrecentDiggingList);
+
         } else {
             return SearchHeader.NO();
         }
 
     }
 
-    public static PagingInfo pageInfo(List<Integer> returnList, Integer nowpnum) {
+    public static PagingInfo pageInfo(List returnList, Integer nowpnum) {
 
         Integer divres = (int)Math.ceil((double)returnList.size() / (double) 10);
         Integer psize;
@@ -499,6 +502,8 @@ public class SearchLogicService {
                 .startNum(startNum)
                 .build();
     }
+
+
 
     public static LinkedHashMap<Integer, LocalDateTime> sortMapByValue(Map<Integer, LocalDateTime> map) {
         List<Map.Entry<Integer, LocalDateTime>> entries = new LinkedList<>(map.entrySet());
