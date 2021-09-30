@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -27,6 +29,7 @@ public class SearchHeader<T> {
     public static <T> SearchHeader<T> NO() {
         return (SearchHeader<T>) SearchHeader.builder()
                 .totalPostsNum(0)
+                .postsList(new ArrayList<>())
                 .build();
     }
 }
