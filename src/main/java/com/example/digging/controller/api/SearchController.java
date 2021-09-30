@@ -23,14 +23,26 @@ public class SearchController {
     private SearchLogicService searchLogicService;
 
     @GetMapping(value = "/keyword", params = { "keyword" })
-    public SearchHeader<ArrayList<RecentDiggingResponse>> searchbykeyword(@RequestParam(name = "keyword") String keyword) {
+    public SearchHeader<ArrayList<RecentDiggingResponse>> searchByKeyword(@RequestParam(name = "keyword") String keyword) {
         log.info("[SEARCH by Keyword] : {}", keyword);
-        return searchLogicService.searchByKeyword(keyword);
+        return searchByKeywordWithPage(keyword, 1);
+    }
+
+    @GetMapping(value = "/keyword", params = { "keyword", "page" })
+    public SearchHeader<ArrayList<RecentDiggingResponse>> searchByKeywordWithPage(@RequestParam(name = "keyword") String keyword, @RequestParam(name = "page") Integer nowpage) {
+        log.info("[SEARCH by Keyword] : {}", keyword, nowpage);
+        return searchLogicService.searchByKeyword(keyword, nowpage);
     }
 
     @GetMapping(value = "/tag", params = { "tag" })
-    public SearchHeader<ArrayList<RecentDiggingResponse>> searchbytag(@RequestParam(name = "tag") String tag) {
+    public SearchHeader<ArrayList<RecentDiggingResponse>> searchByTag(@RequestParam(name = "tag") String tag) {
         log.info("[SEARCH by tag] : {}", tag);
-        return searchLogicService.searchByTag(tag);
+        return searchByTagWithPage(tag, 1);
+    }
+
+    @GetMapping(value = "/tag", params = { "tag", "page" })
+    public SearchHeader<ArrayList<RecentDiggingResponse>> searchByTagWithPage(@RequestParam(name = "tag") String tag, @RequestParam(name = "page") Integer page) {
+        log.info("[SEARCH by tag] : {}", tag);
+        return searchLogicService.searchByTag(tag, page);
     }
 }
