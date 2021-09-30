@@ -2,6 +2,7 @@ package com.example.digging.service;
 
 
 import com.example.digging.domain.entity.*;
+import com.example.digging.domain.network.PagingInfo;
 import com.example.digging.domain.network.Search;
 import com.example.digging.domain.network.SearchHeader;
 import com.example.digging.domain.network.response.ImgsApiResponse;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.comparator.Comparators;
 
+import java.lang.reflect.Array;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -48,7 +50,7 @@ public class SearchLogicService {
 
 
 
-    public SearchHeader<ArrayList<RecentDiggingResponse>> searchByKeyword(String keyword) {
+    public SearchHeader<ArrayList<RecentDiggingResponse>> searchByKeyword(String keyword, Integer nowpage) {
 
         User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUid)
                 .orElseThrow(() -> new RuntimeException("token 오류 입니다. 사용자를 찾을 수 없습니다."));
@@ -164,14 +166,22 @@ public class SearchLogicService {
                 }
             }
         }
-
-
+        System.out.println(LocalDateTime.now());
+        System.out.println(1/3 + 1%3);
+        System.out.println(4/3 + 4%3);
+        System.out.println(3/3 + 3%3);
+        System.out.println(6/3 + 3%3);
         List<Integer> keySetList = new ArrayList<>(map.keySet());
         if(keySetList.size() == 0) {
             return SearchHeader.NO();
         }
-        List<Integer> valueSetList = new ArrayList<>();
 
+        Integer totalpagenum = (int)Math.ceil((double)keySetList.size() / (double) 10);
+        if(totalpagenum < nowpage) {
+            return SearchHeader.NO(totalpagenum);
+        }
+        List<Integer> valueSetList = new ArrayList<>();
+        System.out.println(LocalDateTime.now());
         // KeyWord 언급 내림차순
         Collections.sort(keySetList, (o1, o2) -> (map.get(o2).compareTo(map.get(o1))));
 
@@ -199,9 +209,11 @@ public class SearchLogicService {
             hashSet.add(item);
         }
 
-
+        System.out.println(LocalDateTime.now());
         ArrayList<Optional<Posts>> orderPostsList = new ArrayList<>();
-
+        System.out.println("!!!!");
+        PagingInfo pInfo = pageInfo(keySetList, nowpage);
+        System.out.println(LocalDateTime.now());
         for(int r=0;r<keySetList.size();r++) {
 
             if(!hashSet.contains(valueSetList.get(r))) {
@@ -223,9 +235,10 @@ public class SearchLogicService {
                 }
             }
         }
+        System.out.println(LocalDateTime.now());
 
         ArrayList<RecentDiggingResponse> keywordDiggingList = new ArrayList<RecentDiggingResponse>();
-        for(int i =0; i<orderPostsList.size(); i++){
+        for(int i =pInfo.getStartNum(); i<(pInfo.getStartNum() + pInfo.getNowSize()); i++){
             if(orderPostsList.get(i).get().getIsLink() == Boolean.TRUE) {
                 PostLink newlink = postLinkRepository.findByPostsPostId(orderPostsList.get(i).get().getPostId());
                 List<PostTag> nowTags = postTagRepository.findAllByPostsPostId(orderPostsList.get(i).get().getPostId());
@@ -315,11 +328,12 @@ public class SearchLogicService {
             }
         }
 
-
+        System.out.println(LocalDateTime.now());
+//        return SearchHeader.OK(orderPostsList.size(), pInfo.getPageNum(), pInfo.getNowSize(), pInfo.getIsFirst(), pInfo.getIsLast(), keywordDiggingList);
         return SearchHeader.OK(orderPostsList.size(), keywordDiggingList);
     }
 
-    public SearchHeader<ArrayList<RecentDiggingResponse>> searchByTag(String tag) {
+    public SearchHeader<ArrayList<RecentDiggingResponse>> searchByTag(String tag, Integer page) {
 
         User userInfo = SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUid)
                 .orElseThrow(() -> new RuntimeException("token 오류 입니다. 사용자를 찾을 수 없습니다."));
@@ -446,6 +460,44 @@ public class SearchLogicService {
             return SearchHeader.NO();
         }
 
+    }
+
+    public static PagingInfo pageInfo(List<Integer> returnList, Integer nowpnum) {
+
+        Integer divres = (int)Math.ceil((double)returnList.size() / (double) 10);
+        Integer psize;
+        Boolean first;
+        Boolean last;
+        Integer startNum = (nowpnum - 1)*10;
+
+        if (nowpnum == divres && divres > 1) {
+            first = Boolean.FALSE;
+            last = Boolean.TRUE;
+            psize = returnList.size() - ((divres - 1) * 10);
+
+        }else if (divres == nowpnum && divres == 1) {
+            first = Boolean.TRUE;
+            last = Boolean.TRUE;
+            psize = returnList.size();
+
+        }else if(nowpnum == 1 && divres > 1){
+            first = Boolean.TRUE;
+            last = Boolean.FALSE;
+            psize = 10;
+
+        }else {
+            first = Boolean.FALSE;
+            last = Boolean.FALSE;
+            psize = 10;
+        }
+
+        return PagingInfo.builder()
+                .pageNum(nowpnum)
+                .nowSize(psize)
+                .isFirst(first)
+                .isLast(last)
+                .startNum(startNum)
+                .build();
     }
 
     public static LinkedHashMap<Integer, LocalDateTime> sortMapByValue(Map<Integer, LocalDateTime> map) {
